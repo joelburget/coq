@@ -87,9 +87,9 @@ type case_style = Constr.case_style =
 
 type 'a cast_type =
   | CastConv of 'a
-  | CastVM of 'a
+  (* | CastVM of 'a *)
   | CastCoerce (** Cast to a base type (eg, an underlying inductive type) *)
-  | CastNative of 'a
+  (* | CastNative of 'a *)
 
 (** Bindings *)
 

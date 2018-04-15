@@ -884,6 +884,7 @@ type library_name = DirPath.t
 
 type library_objects = Lib.lib_objects * Lib.lib_objects
 
+(*
 (** For the native compiler, we cache the library values *)
 
 let register_library dir cenv (objs:library_objects) digest univ =
@@ -922,11 +923,13 @@ let end_library ?except dir =
   assert (ModPath.equal mp (MPfile dir));
   let substitute, keep, _ = Lib.classify_segment lib_stack in
   cenv,(substitute,keep),ast
+*)
 
 
 
 (** {6 Implementation of Import and Export commands} *)
 
+(*
 let really_import_module mp =
   (* May raise Not_found for unknown module and for functors *)
   let prefix,sobjs,keepobjs = ModObjs.get mp in
@@ -954,6 +957,7 @@ let in_import : bool * ModPath.t -> obj =
 
 let import_module export mp =
   Lib.add_anonymous_leaf (in_import (export,mp))
+*)
 
 
 (** {6 Iterators} *)

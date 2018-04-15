@@ -78,6 +78,7 @@ let print_response = function
   | Noluck -> "NOLUCK\n"
   | Pong (n,m,p) -> Printf.sprintf "PONG %d %d %d\n" n m p
 
+(*
 let connect s =
   try
     match Str.split (Str.regexp ":") s with
@@ -88,12 +89,14 @@ let connect s =
         Some s
     | _ -> None
   with Unix.Unix_error _ -> None
+  *)
 
 let manager = ref None
 
 let option_map f = function None -> None | Some x -> Some (f x)
 
-let init p =
+let init p = ()
+(*
   try
     let sock = Sys.getenv "COQWORKMGR_SOCK" in
     manager := option_map (fun s -> 
@@ -104,6 +107,7 @@ let init p =
       output_string cout (print_request (Hello p)); flush cout;
       cin, cout) (connect sock)
   with Not_found | End_of_file -> ()
+*)
 
 let with_manager f g =
   try

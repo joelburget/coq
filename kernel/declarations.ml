@@ -85,7 +85,7 @@ type constant_body = {
     const_hyps : Context.Named.t; (** New: younger hyp at top *)
     const_body : constant_def;
     const_type : types;
-    const_body_code : Cemitcodes.to_patch_substituted option;
+    (* const_body_code : Cemitcodes.to_patch_substituted option; *)
     const_universes : constant_universes;
     const_proj : projection_body option;
     const_inline_code : bool;
@@ -167,7 +167,7 @@ type one_inductive_body = {
 
     mind_nb_args : int; (** number of no constant constructor *)
 
-    mind_reloc_tbl :  Cbytecodes.reloc_table;
+    (* mind_reloc_tbl :  Cbytecodes.reloc_table; *)
   }
 
 type abstract_inductive_universes =
@@ -267,7 +267,8 @@ and 'a generic_module_body =
       set of all universes constraints in the module  *)
     mod_delta : Mod_subst.delta_resolver; (**
       quotiented set of equivalent constants and inductive names *)
-    mod_retroknowledge : 'a module_retroknowledge }
+    (* mod_retroknowledge : 'a module_retroknowledge; *)
+    }
 
 (** For a module, there are five possible situations:
     - [Declare Module M : T] then [mod_expr = Abstract; mod_type_alg = Some T]
@@ -286,10 +287,12 @@ and module_body = module_implementation generic_module_body
 
 and module_type_body = unit generic_module_body
 
+(*
 and _ module_retroknowledge =
 | ModBodyRK :
   Retroknowledge.action list -> module_implementation module_retroknowledge
 | ModTypeRK : unit module_retroknowledge
+*)
 
 (** Extra invariants :
 

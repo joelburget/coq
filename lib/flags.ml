@@ -127,11 +127,12 @@ let if_warn f x = if !warn then f x
 (* Flags for external tools *)
 
 let browser_cmd_fmt =
+  (*
  try
   let coq_netscape_remote_var = "COQREMOTEBROWSER" in
   Sys.getenv coq_netscape_remote_var
  with
-  Not_found -> Coq_config.browser
+  Not_found -> *) Coq_config.browser
 
 let is_standard_doc_url url =
   let wwwcompatprefix = "http://www.lix.polytechnique.fr/coq/" in

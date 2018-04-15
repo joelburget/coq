@@ -53,7 +53,7 @@ type case_info = Constr.case_info =
   }
 
 type cast_kind = Constr.cast_kind =
-  VMcast | NATIVEcast | DEFAULTcast | REVERTcast
+  (* VMcast | NATIVEcast | *) DEFAULTcast | REVERTcast
 
 (********************************************************************)
 (*       Constructions as implemented                               *)
@@ -94,7 +94,7 @@ type ('constr, 'types, 'sort, 'univs) kind_of_term =
   | CoFix     of ('constr, 'types) pcofixpoint
   | Proj      of projection * 'constr
 
-type values = Vmvalues.values
+(* type values = Vmvalues.values *)
 
 (**********************************************************************)
 (**         Redeclaration of functions from module Constr             *)

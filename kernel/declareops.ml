@@ -102,8 +102,8 @@ let subst_const_body sub cb =
         const_body = body';
         const_type = type';
         const_proj = proj';
-        const_body_code =
-          Option.map (Cemitcodes.subst_to_patch_subst sub) cb.const_body_code;
+        (* const_body_code =
+          Option.map (Cemitcodes.subst_to_patch_subst sub) cb.const_body_code; *)
         const_universes = cb.const_universes;
         const_inline_code = cb.const_inline_code;
         const_typing_flags = cb.const_typing_flags }
@@ -207,8 +207,8 @@ let subst_mind_packet sub mbp =
     mind_kelim = mbp.mind_kelim;
     mind_recargs = subst_wf_paths sub mbp.mind_recargs (*wf_paths*);
     mind_nb_constant = mbp.mind_nb_constant;
-    mind_nb_args = mbp.mind_nb_args;
-    mind_reloc_tbl = mbp.mind_reloc_tbl }
+    mind_nb_args = mbp.mind_nb_args; }
+    (* mind_reloc_tbl = mbp.mind_reloc_tbl } *)
 
 let subst_mind_record sub (id, ps, pb as r) =
   let ps' = Array.smartmap (subst_constant sub) ps in
@@ -358,7 +358,7 @@ and hcons_generic_module_body :
   let type_alg' = mb.mod_type_alg in
   let constraints' = Univ.hcons_universe_context_set mb.mod_constraints in
   let delta' = mb.mod_delta in
-  let retroknowledge' = mb.mod_retroknowledge in
+  (* let retroknowledge' = mb.mod_retroknowledge in *)
 
   if
     mb.mod_mp == mp' &&
@@ -366,8 +366,8 @@ and hcons_generic_module_body :
     mb.mod_type == type' &&
     mb.mod_type_alg == type_alg' &&
     mb.mod_constraints == constraints' &&
-    mb.mod_delta == delta' &&
-    mb.mod_retroknowledge == retroknowledge'
+    mb.mod_delta == delta' (* &&
+    mb.mod_retroknowledge == retroknowledge' *)
   then mb
   else {
     mod_mp = mp';
@@ -376,7 +376,7 @@ and hcons_generic_module_body :
     mod_type_alg = type_alg';
     mod_constraints = constraints';
     mod_delta = delta';
-    mod_retroknowledge = retroknowledge';
+    (* mod_retroknowledge = retroknowledge'; *)
   }
 
 and hcons_module_body mb =

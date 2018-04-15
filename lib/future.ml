@@ -113,10 +113,13 @@ let create_delegate ?(blocking=true) ~name fix_exn =
     signal () in
   let wait, signal =
     if not blocking then (fun () -> raise (NotReady name)), ignore else
+      (fun () -> ()), (fun () -> ()) in
+  (*
     let lock = Mutex.create () in
     let cond = Condition.create () in
     (fun () -> Mutex.lock lock; Condition.wait cond lock; Mutex.unlock lock),
     (fun () -> Mutex.lock lock; Condition.broadcast cond; Mutex.unlock lock) in
+  *)
   let ck = create ~name fix_exn (Delegated wait) in
   ck, assignement signal ck
 

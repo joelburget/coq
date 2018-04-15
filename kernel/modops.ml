@@ -146,11 +146,11 @@ let rec functor_iter fty f0 = function
 
 let module_type_of_module mb =
   { mb with mod_expr = (); mod_type_alg = None;
-    mod_retroknowledge = ModTypeRK; }
+    (* mod_retroknowledge = ModTypeRK; *) }
 
 let module_body_of_type mp mtb =
   { mtb with mod_expr = Abstract; mod_mp = mp;
-      mod_retroknowledge = ModBodyRK []; }
+      (* mod_retroknowledge = ModBodyRK []; *) }
 
 let check_modpath_equiv env mp1 mp2 =
   if ModPath.equal mp1 mp2 then ()
@@ -263,6 +263,7 @@ let subst_structure subst = subst_structure subst do_delta_codom
 
 (** {6 Retroknowledge } *)
 
+(*
 (* spiwack: here comes the function which takes care of importing
    the retroknowledge declared in the library *)
 (* lclrk : retroknowledge_action list, rkaction : retroknowledge action *)
@@ -284,6 +285,7 @@ let add_retroknowledge mp =
      tail recursivity, but the world will have exploded before any module
      imports 10 000 retroknowledge registration.*)
   List.fold_right perform lclrk env
+*)
 
 (** {6 Adding a module in the environment } *)
 
@@ -310,7 +312,7 @@ and add_module mb linkinfo env =
   let env = Environ.shallow_add_module mb env in
   match mb.mod_type with
   |NoFunctor struc ->
-    add_retroknowledge mp mb.mod_retroknowledge
+    (* add_retroknowledge mp mb.mod_retroknowledge *)
       (add_structure mp struc mb.mod_delta linkinfo env)
   |MoreFunctor _ -> env
 
@@ -340,8 +342,8 @@ let strengthen_const mp_from l cb resolver =
       | Polymorphic_const ctx -> Univ.make_abstract_instance ctx
     in
       { cb with
-	const_body = Def (Mod_subst.from_val (mkConstU (con,u)));
-	const_body_code = Some (Cemitcodes.from_val (Cbytegen.compile_alias con)) }
+  const_body = Def (Mod_subst.from_val (mkConstU (con,u))); }
+        (* const_body_code = Some (Cemitcodes.from_val (Cbytegen.compile_alias con)) } *)
 
 let rec strengthen_mod mp_from mp_to mb =
   if mp_in_delta mb.mod_mp mb.mod_delta then mb

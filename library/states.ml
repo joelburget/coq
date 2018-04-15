@@ -9,7 +9,8 @@
 (************************************************************************)
 
 open Util
-open System
+(* open System *)
+let with_magic_number_check f x = f x
 
 type state = Lib.frozen * Summary.frozen
 
@@ -23,12 +24,14 @@ let unfreeze (fl,fs) =
   Lib.unfreeze fl;
   Summary.unfreeze_summaries fs
 
+  (*
 let extern_state s =
   System.extern_state Coq_config.state_magic_number s (freeze ~marshallable:`Yes)
 
 let intern_state s =
   unfreeze (with_magic_number_check (System.intern_state Coq_config.state_magic_number) s);
   Library.overwrite_library_filenames s
+  *)
 
 (* Rollback. *)
 

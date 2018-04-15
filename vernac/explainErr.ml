@@ -34,7 +34,7 @@ let explain_exn_default = function
   | Sys_error msg -> hov 0 (str "System error: " ++ guill msg)
   | Out_of_memory -> hov 0 (str "Out of memory.")
   | Stack_overflow -> hov 0 (str "Stack overflow.")
-  | Dynlink.Error e -> hov 0 (str "Dynlink error: " ++ str Dynlink.(error_message e))
+  (* | Dynlink.Error e -> hov 0 (str "Dynlink error: " ++ str Dynlink.(error_message e)) *)
   | Timeout -> hov 0 (str "Timeout!")
   | Sys.Break -> hov 0 (fnl () ++ str "User interrupt.")
   (* Exceptions with pre-evaluated error messages *)
@@ -70,8 +70,8 @@ let process_vernac_interp_error exn = match fst exn with
       wrap_vernac_error exn (Himsg.explain_inductive_error e)
   | Modops.ModuleTypingError e ->
       wrap_vernac_error exn (Himsg.explain_module_error e)
-  | Modintern.ModuleInternalizationError e ->
-      wrap_vernac_error exn (Himsg.explain_module_internalization_error e)
+  (* | Modintern.ModuleInternalizationError e ->
+      wrap_vernac_error exn (Himsg.explain_module_internalization_error e) *)
   | RecursionSchemeError e ->
       wrap_vernac_error exn (Himsg.explain_recursion_scheme_error e)
   | Cases.PatternMatchingError (env,sigma,e) ->

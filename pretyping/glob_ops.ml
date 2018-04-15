@@ -69,10 +69,10 @@ let rec cases_pattern_eq p1 p2 = match DAst.get p1, DAst.get p2 with
 
 let cast_type_eq eq t1 t2 = match t1, t2 with
   | CastConv t1, CastConv t2 -> eq t1 t2
-  | CastVM t1, CastVM t2 -> eq t1 t2
+  (* | CastVM t1, CastVM t2 -> eq t1 t2 *)
   | CastCoerce, CastCoerce -> true
-  | CastNative t1, CastNative t2 -> eq t1 t2
-  | (CastConv _ | CastVM _ | CastCoerce | CastNative _), _ -> false
+  (* | CastNative t1, CastNative t2 -> eq t1 t2 *)
+  | (CastConv _ (* | CastVM _*) | CastCoerce (* | CastNative _ *)), _ -> false
 
 let matching_var_kind_eq k1 k2 = match k1, k2 with
 | FirstOrderPatVar ido1, FirstOrderPatVar ido2 -> Id.equal ido1 ido2
@@ -227,7 +227,7 @@ let fold_glob_constr f acc = DAst.with_val (function
     Array.fold_left f (Array.fold_left f acc tyl) bv
   | GCast (c,k) ->
     let acc = match k with
-      | CastConv t | CastVM t | CastNative t -> f acc t | CastCoerce -> acc in
+      | CastConv t (* | CastVM t | CastNative t *) -> f acc t | CastCoerce -> acc in
     f acc c
   | GProj(_,c) ->
     f acc c
@@ -270,7 +270,7 @@ let fold_glob_constr_with_binders g f v acc = DAst.(with_val (function
     Array.fold_left_i f' acc idl
   | GCast (c,k) ->
     let acc = match k with
-      | CastConv t | CastVM t | CastNative t -> f v acc t | CastCoerce -> acc in
+      | CastConv t (* | CastVM t | CastNative t *) -> f v acc t | CastCoerce -> acc in
     f v acc c
   | GProj(_,c) ->
     f v acc c

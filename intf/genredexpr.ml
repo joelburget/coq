@@ -47,7 +47,7 @@ type ('a,'b,'c) red_expr_gen =
   | Pattern of 'a Locus.with_occurrences list
   | ExtraRedExpr of string
   | CbvVm of ('b,'c) Util.union Locus.with_occurrences option
-  | CbvNative of ('b,'c) Util.union Locus.with_occurrences option
+  (* | CbvNative of ('b,'c) Util.union Locus.with_occurrences option *)
 
 type ('a,'b,'c) may_eval =
   | ConstrTerm of 'a

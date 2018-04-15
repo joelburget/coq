@@ -470,7 +470,7 @@ type unsafe_type_judgment = types punsafe_type_judgment
 
 (*s Compilation of global declaration *)
 
-let compile_constant_body = Cbytegen.compile_constant_body ~fail_on_error:false
+(* let compile_constant_body = Cbytegen.compile_constant_body ~fail_on_error:false *)
 
 exception Hyp_not_found
 
@@ -508,6 +508,7 @@ let remove_hyps ids check_context check_value ctxt =
    note that the "consistent" register function is available in the module
    Safetyping, Environ only synchronizes the proactive and the reactive parts*)
 
+(*
 open Retroknowledge
 
 (* lifting of the "get" functions works also for "mem"*)
@@ -563,88 +564,9 @@ let dispatch =
   let int31_op n op prim kn =
     { empty_reactive_info with
       vm_compiling = Some (Clambda.compile_prim n op kn);
-      native_compiling = Some (Nativelambda.compile_prim prim (Univ.out_punivs kn));
+      (* native_compiling = Some (Nativelambda.compile_prim prim (Univ.out_punivs kn)); *)
     }
   in
 
-fun rk value field ->
-  (* subfunction which shortens the (very common) dispatch of operations *)
-  let int31_op_from_const n op prim =
-    match kind value with
-      | Const kn ->  int31_op n op prim kn
-      | _ -> anomaly ~label:"Environ.register" (Pp.str "should be a constant.")
-  in
-  let int31_binop_from_const op prim = int31_op_from_const 2 op prim in
-  let int31_unop_from_const op prim = int31_op_from_const 1 op prim in
-  match field with
-    | KInt31 (grp, Int31Type) ->
-        let int31bit =
-          (* invariant : the type of bits is registered, otherwise the function
-             would raise Not_found. The invariant is enforced in safe_typing.ml *)
-          match field with
-          | KInt31 (grp, Int31Type) -> Retroknowledge.find rk (KInt31 (grp,Int31Bits))
-          | _ -> anomaly ~label:"Environ.register"
-              (Pp.str "add_int31_decompilation_from_type called with an abnormal field.")
-        in
-        let i31bit_type =
-          match kind int31bit with
-          | Ind (i31bit_type,_) -> i31bit_type
-          |  _ -> anomaly ~label:"Environ.register"
-              (Pp.str "Int31Bits should be an inductive type.")
-        in
-        let int31_decompilation =
-          match kind value with
-          | Ind (i31t,_) ->
-              constr_of_int31 i31t i31bit_type
-          | _ -> anomaly ~label:"Environ.register"
-              (Pp.str "should be an inductive type.")
-        in
-        { empty_reactive_info with
-          vm_decompile_const = Some int31_decompilation;
-          vm_before_match = Some Clambda.int31_escape_before_match;
-          native_before_match = Some (Nativelambda.before_match_int31 i31bit_type);
-        }
-    | KInt31 (_, Int31Constructor) ->
-        { empty_reactive_info with
-          vm_constant_static = Some Clambda.compile_structured_int31;
-          vm_constant_dynamic = Some Clambda.dynamic_int31_compilation;
-          native_constant_static = Some Nativelambda.compile_static_int31;
-          native_constant_dynamic = Some Nativelambda.compile_dynamic_int31;
-        }
-    | KInt31 (_, Int31Plus) -> int31_binop_from_const Cbytecodes.Kaddint31
-							  CPrimitives.Int31add
-    | KInt31 (_, Int31PlusC) -> int31_binop_from_const Cbytecodes.Kaddcint31
-							   CPrimitives.Int31addc
-    | KInt31 (_, Int31PlusCarryC) -> int31_binop_from_const Cbytecodes.Kaddcarrycint31
-								CPrimitives.Int31addcarryc
-    | KInt31 (_, Int31Minus) -> int31_binop_from_const Cbytecodes.Ksubint31
-							   CPrimitives.Int31sub
-    | KInt31 (_, Int31MinusC) -> int31_binop_from_const Cbytecodes.Ksubcint31
-							    CPrimitives.Int31subc
-    | KInt31 (_, Int31MinusCarryC) -> int31_binop_from_const
-	                                Cbytecodes.Ksubcarrycint31 CPrimitives.Int31subcarryc
-    | KInt31 (_, Int31Times) -> int31_binop_from_const Cbytecodes.Kmulint31
-							   CPrimitives.Int31mul
-    | KInt31 (_, Int31TimesC) -> int31_binop_from_const Cbytecodes.Kmulcint31
-							   CPrimitives.Int31mulc
-    | KInt31 (_, Int31Div21) -> int31_op_from_const 3 Cbytecodes.Kdiv21int31
-                                                           CPrimitives.Int31div21
-    | KInt31 (_, Int31Diveucl) -> int31_binop_from_const Cbytecodes.Kdivint31
-							 CPrimitives.Int31diveucl
-    | KInt31 (_, Int31AddMulDiv) -> int31_op_from_const 3 Cbytecodes.Kaddmuldivint31
-                                                         CPrimitives.Int31addmuldiv
-    | KInt31 (_, Int31Compare) -> int31_binop_from_const Cbytecodes.Kcompareint31
-							     CPrimitives.Int31compare
-    | KInt31 (_, Int31Head0) -> int31_unop_from_const Cbytecodes.Khead0int31
-							  CPrimitives.Int31head0
-    | KInt31 (_, Int31Tail0) -> int31_unop_from_const Cbytecodes.Ktail0int31
-							  CPrimitives.Int31tail0
-    | KInt31 (_, Int31Lor) -> int31_binop_from_const Cbytecodes.Klorint31
-							 CPrimitives.Int31lor
-    | KInt31 (_, Int31Land) -> int31_binop_from_const Cbytecodes.Klandint31
-							  CPrimitives.Int31land
-    | KInt31 (_, Int31Lxor) -> int31_binop_from_const Cbytecodes.Klxorint31
-							  CPrimitives.Int31lxor
-    | _ -> empty_reactive_info
-
 let _ = Hook.set Retroknowledge.dispatch_hook dispatch
+*)

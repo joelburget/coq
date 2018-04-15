@@ -661,8 +661,8 @@ let tag_var = tag Tag.variable
           hv 0 (pr mt (lcast,L) a ++ spc () ++
                   match b with
                     | CastConv b -> str ":" ++ ws 1 ++ pr mt (-lcast,E) b
-                    | CastVM b -> str "<:" ++ ws 1 ++ pr mt (-lcast,E) b
-                    | CastNative b -> str "<<:" ++ ws 1 ++ pr mt (-lcast,E) b
+                    (* | CastVM b -> str "<:" ++ ws 1 ++ pr mt (-lcast,E) b
+                    | CastNative b -> str "<<:" ++ ws 1 ++ pr mt (-lcast,E) b *)
                     | CastCoerce -> str ":>"),
           lcast
         )

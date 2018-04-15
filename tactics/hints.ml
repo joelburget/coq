@@ -1279,7 +1279,7 @@ let interp_hints poly =
       prepare_hint true (poly,false) (Global.env()) Evd.empty (evd,c) in
   let fref r =
     let gr = global_with_alias r in
-    Dumpglob.add_glob ?loc:r.CAst.loc gr;
+    (* Dumpglob.add_glob ?loc:r.CAst.loc gr; *)
     gr in
   let fr r = evaluable_of_global_reference env (fref r) in
   let fi c =

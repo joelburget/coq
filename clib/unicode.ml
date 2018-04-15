@@ -257,13 +257,15 @@ let ident_refutation s =
   | Invalid_argument _ -> Some (true,escaped_non_utf8 s^": invalid utf8 sequence.")
 
 let lowercase_unicode =
-  let tree = Segmenttree.make Unicodetable.to_lower in
-  fun unicode ->
+  (* let tree = Segmenttree.make Unicodetable.to_lower in *)
+  fun unicode -> unicode
+  (*
     try
       match Segmenttree.lookup unicode tree with
         | `Abs c -> c
         | `Delta d -> unicode + d
     with Not_found -> unicode
+    *)
 
 let lowercase_first_char s =
   assert (s <> "");

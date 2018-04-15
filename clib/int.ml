@@ -10,9 +10,11 @@
 
 type t = int
 
-external equal : int -> int -> bool = "%eq"
+(* external equal : int -> int -> bool = "%eq" *)
+let equal : int -> int -> bool = (==)
 
-external compare : int -> int -> int = "caml_int_compare"
+(* external compare : int -> int -> int = "caml_int_compare" *)
+let compare : int -> int -> int = Pervasives.compare
 
 let hash i = i land 0x3FFFFFFF
 

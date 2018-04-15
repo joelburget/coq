@@ -584,7 +584,8 @@ end = struct (* {{{ *)
     let info = get_info id in
     info.n_reached <- info.n_reached + 1
   let goals id n = (get_info id).n_goals <- n
-  let cur_tip () = get_branch_pos (current_branch ())
+  let cur_tip () = Js.log3 "getting cur_tip" (current_branch ()) (get_branch_pos (current_branch ())); get_branch_pos (current_branch ())
+
 
   let proof_nesting () = Vcs_aux.proof_nesting !vcs
 
@@ -1064,7 +1065,7 @@ let stm_vernac_interp ?proof ?route id st { verbose; loc; expr } : Vernacstate.t
      the whole document state, such as backtrack, etc... so we start
      to design the stm command interpreter now *)
   set_id_for_feedback ?route dummy_doc id;
-  Aux_file.record_in_aux_set_at ?loc ();
+  (* Aux_file.record_in_aux_set_at ?loc (); *)
   (* We need to check if a command should be filtered from
    * vernac_entries, as it cannot handle it. This should go away in
    * future refactorings.
@@ -1231,6 +1232,7 @@ end = struct (* {{{ *)
 
 end (* }}} *)
 
+(*
 let hints = ref Aux_file.empty_aux_file
 let set_compilation_hints file =
   hints := Aux_file.load_aux_file_for file
@@ -1255,6 +1257,7 @@ let record_pb_time ?loc proof_name time =
     Aux_file.record_in_aux_at proof_name proof_build_time;
     hints := Aux_file.set !hints proof_name proof_build_time
   end
+*)
 
 exception RemoteException of Pp.t
 let _ = CErrors.register_handler (function
@@ -1452,7 +1455,7 @@ end = struct (* {{{ *)
               RespBuiltProof (pl, time) ->
         feedback (InProgress ~-1);
         t_assign (`Val pl);
-        record_pb_time ?loc:t_loc t_name time;
+        (* record_pb_time ?loc:t_loc t_name time; *)
         if !cur_opt.async_proofs_full || t_drop
         then `Stay(t_states,[States t_states])
         else `End
@@ -1478,12 +1481,14 @@ end = struct (* {{{ *)
 
   let build_proof_here ?loc ~drop_pt (id,valid) eop =
     Future.create (State.exn_on id ~valid) (fun () ->
-      let wall_clock1 = Unix.gettimeofday () in
+      (* let wall_clock1 = Unix.gettimeofday () in *)
       if VCS.is_interactive () = `No then Reach.known_state ~cache:`No eop
       else Reach.known_state ~cache:`Shallow eop;
+      (*
       let wall_clock2 = Unix.gettimeofday () in
       Aux_file.record_in_aux_at ?loc "proof_build_time"
         (Printf.sprintf "%.3f" (wall_clock2 -. wall_clock1));
+      *)
       let p = Proof_global.return_proof ~allow_partial:drop_pt () in
       if drop_pt then feedback ~id Complete;
       p)
@@ -1493,10 +1498,10 @@ end = struct (* {{{ *)
       VCS.restore document;
       VCS.print ();
       let proof, future_proof, time =
-        let wall_clock = Unix.gettimeofday () in
+        (* let wall_clock = Unix.gettimeofday () in *)
         let fp = build_proof_here ?loc ~drop_pt:drop exn_info stop in
         let proof = Future.force fp in
-        proof, fp, Unix.gettimeofday () -. wall_clock in
+        proof, fp, 0.0 (* Unix.gettimeofday () -. wall_clock *) in
       (* We typecheck the proof with the kernel (in the worker) to spot
        * the few errors tactics don't catch, like the "fix" tactic building
        * a bad fixpoint *)
@@ -1611,10 +1616,12 @@ and Slaves : sig
   val dump_snapshot : unit -> Future.UUID.t tasks
   val check_task : string -> int tasks -> int -> bool
   val info_tasks : 'a tasks -> (string * float * int) list
+  (*
   val finish_task :
     string ->
     Library.seg_univ -> Library.seg_discharge -> Library.seg_proofs ->
     int tasks -> int -> Library.seg_univ
+    *)
 
   val cancel_worker : WorkerPool.worker_id -> unit
 
@@ -1739,13 +1746,15 @@ end = struct (* {{{ *)
 
   let info_tasks l =
     CList.map_i (fun i ({ Stateid.loc; name }, _) ->
+      (*
       let time1 =
         try float_of_string (Aux_file.get ?loc !hints "proof_build_time")
         with Not_found -> 0.0 in
       let time2 =
         try float_of_string (Aux_file.get ?loc !hints "proof_check_time")
         with Not_found -> 0.0 in
-      name, max (time1 +. time2) 0.0001,i) 0 l
+      *)
+      name, (* max (time1 +. time2) *) 0.0001,i) 0 l
 
   let set_perspective idl =
     ProofTask.set_perspective idl;
@@ -1965,7 +1974,7 @@ end = struct (* {{{ *)
       find ~time:false ~batch:false ~fail:false e in
     let st = Vernacstate.freeze_interp_state `No in
     Vernacentries.with_fail st fail (fun () ->
-    (if time then System.with_time ~batch else (fun x -> x)) (fun () ->
+    ((*if time then System.with_time ~batch else*) (fun x -> x)) (fun () ->
     ignore(TaskQueue.with_n_workers nworkers (fun queue ->
     Proof_global.with_current_proof (fun _ p ->
       let goals, _, _, _, _ = Proof.proof p in
@@ -2115,8 +2124,8 @@ let async_policy () =
     (VCS.is_vio_doc () || !cur_opt.async_proofs_mode <> APoff)
 
 let delegate name =
-     get_hint_bp_time name >= !cur_opt.async_proofs_delegation_threshold
-  || VCS.is_vio_doc ()
+     (* get_hint_bp_time name >= !cur_opt.async_proofs_delegation_threshold
+  || *) VCS.is_vio_doc ()
   || !cur_opt.async_proofs_full
 
 let warn_deprecated_nested_proofs =
@@ -2194,12 +2203,12 @@ let collect_proof keep cur hd brkind id =
        has_proof_no_using last && not (State.is_cached_and_valid (parent last)) &&
        VCS.is_vio_doc () ->
         assert (VCS.Branch.equal hd hd'||VCS.Branch.equal hd VCS.edit_branch);
-        (try
+        ((*try
           let name, hint = name ids, get_hint_ctx loc  in
           let t, v = proof_no_using last in
           v.expr <- VernacExpr([], VernacProof(t, Some hint));
           `ASync (parent last,accn,name,delegate name)
-        with Not_found ->
+        with Not_found -> *)
           let name = name ids in
           `MaybeASync (parent last, accn, name, delegate name))
     | `Fork((_, hd', GuaranteesOpacity, ids), _) ->
@@ -2402,7 +2411,7 @@ let known_state ?(redefine_qed=false) ~cache id =
             resilient_command reach view.next;
             let st = Vernacstate.freeze_interp_state `No in
             ignore(stm_vernac_interp id st x);
-            wall_clock_last_fork := Unix.gettimeofday ()
+            wall_clock_last_fork := 0.0 (* Unix.gettimeofday () *)
           ), `Yes, true
       | `Fork ((x,_,_,_), Some prev) -> (fun () -> (* nested proof *)
             reach ~cache:`Shallow prev;
@@ -2415,7 +2424,7 @@ let known_state ?(redefine_qed=false) ~cache id =
               let (e, info) = CErrors.push e in
               let info = Stateid.add info ~valid:prev id in
               Exninfo.iraise (e, info));
-            wall_clock_last_fork := Unix.gettimeofday ()
+            wall_clock_last_fork := 0.0 (* Unix.gettimeofday () *)
           ), `Yes, true
       | `Qed ({ qast = x; keep; brinfo; brname } as qed, eop) ->
           let rec aux = function
@@ -2476,8 +2485,10 @@ let known_state ?(redefine_qed=false) ~cache id =
           | `Sync (name, reason) -> (fun () ->
                 log_processing_sync id name reason;
                 reach eop;
+                (*
                 let wall_clock = Unix.gettimeofday () in
                 record_pb_time name ?loc:x.loc (wall_clock -. !wall_clock_last_fork);
+                *)
                 let proof =
                   match keep with
                   | VtDrop -> None
@@ -2491,12 +2502,14 @@ let known_state ?(redefine_qed=false) ~cache id =
                                 (State.exn_on id ~valid:eop)) in
                 if keep != VtKeepAsAxiom then
                   reach view.next;
-                let wall_clock2 = Unix.gettimeofday () in
+                (* let wall_clock2 = Unix.gettimeofday () in *)
                 let st = Vernacstate.freeze_interp_state `No in
                 ignore(stm_vernac_interp id ?proof st x);
+                (*
                 let wall_clock3 = Unix.gettimeofday () in
                 Aux_file.record_in_aux_at ?loc:x.loc "proof_check_time"
                   (Printf.sprintf "%.3f" (wall_clock3 -. wall_clock2));
+                *)
                 Proof_global.discard_all ()
               ), `Yes, true
           | `MaybeASync (start, nodes, name, delegate) -> (fun () ->
@@ -2542,7 +2555,9 @@ type stm_init_options = {
 
   (* Initial load path in scope for the document. Usually extracted
      from -R options / _CoqProject *)
+  (*
   iload_path   : Mltop.coq_path list;
+  *)
 
   (* Require [require_libs] before the initial state is
      ready. Parameters follow [Library], that is to say,
@@ -2564,10 +2579,10 @@ let doc_type_module_name (std : stm_doc_type) =
 *)
 
 let init_core () =
-  if !cur_opt.async_proofs_mode = APon then Control.enable_thread_delay := true;
+  if !cur_opt.async_proofs_mode = APon then (* Control.enable_thread_delay := true; *)
   State.register_root_state ()
 
-let new_doc { doc_type ; iload_path; require_libs; stm_options } =
+let new_doc { doc_type ; (* iload_path; *) require_libs; stm_options } =
 
   let load_objs libs =
     let rq_file (dir, from, exp) =
@@ -2588,13 +2603,16 @@ let new_doc { doc_type ; iload_path; require_libs; stm_options } =
   (* Set load path; important, this has to happen before we declare
      the library below as [Declaremods/Library] will infer the module
      name by looking at the load path! *)
+  (*
   List.iter Mltop.add_coq_path iload_path;
+  *)
 
   begin match doc_type with
   | Interactive ln ->
-    Safe_typing.allow_delayed_constants := true;
-    Declaremods.start_library ln
+    Safe_typing.allow_delayed_constants := true (*;
+    Declaremods.start_library ln*)
 
+    (*
   | VoDoc ln ->
     let ldir = Flags.verbosely Library.start_library ln in
     VCS.set_ldir ldir;
@@ -2605,6 +2623,7 @@ let new_doc { doc_type ; iload_path; require_libs; stm_options } =
     let ldir = Flags.verbosely Library.start_library ln in
     VCS.set_ldir ldir;
     set_compilation_hints ln
+    *)
   end;
 
   (* Import initial libraries. *)
@@ -2691,6 +2710,7 @@ let check_task name (tasks,rcbackup) i =
   with e when CErrors.noncritical e -> VCS.restore vcs; false
 let info_tasks (tasks,_) = Slaves.info_tasks tasks
 
+(*
 let finish_tasks name u d p (t,rcbackup as tasks) =
   RemoteCounter.restore rcbackup;
   let finish_task u (_,_,i) =
@@ -2705,6 +2725,7 @@ let finish_tasks name u d p (t,rcbackup as tasks) =
     let e = CErrors.push e in
     msg_warning (str"File " ++ str name ++ str ":" ++ spc () ++ iprint e);
     exit 1
+    *)
 
 let merge_proof_branch ~valid ?id qast keep brname =
   let brinfo = VCS.get_branch brname in
@@ -2747,6 +2768,7 @@ let handle_failure (e, info) vcs =
       VCS.print ();
       Exninfo.iraise (e, info)
 
+      (*
 let snapshot_vio ~doc ldir long_f_dot_vo =
   let doc = finish ~doc in
   if List.length (VCS.branches ()) > 1 then
@@ -2754,6 +2776,7 @@ let snapshot_vio ~doc ldir long_f_dot_vo =
   Library.save_library_to ~todo:(dump_snapshot ()) ldir long_f_dot_vo
     (Global.opaque_tables ());
   doc
+  *)
 
 let reset_task_queue = Slaves.reset_task_queue
 
@@ -2976,6 +2999,7 @@ let parse_sentence ~doc sid pa =
   (* Reach.known_state ~cache:`Yes sid; *)
   let cur_tip = VCS.cur_tip () in
   let real_tip = !State.cur_id in
+  Js.log4 "cur_tip:" cur_tip "real_tip:" real_tip;
   if not (Stateid.equal sid cur_tip) then
     user_err ~hdr:"Stm.parse_sentence"
       (str "Currently, the parsing api only supports parsing at the tip of the document." ++ fnl () ++

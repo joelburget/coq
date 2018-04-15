@@ -49,12 +49,12 @@ let lookup_module_or_modtype kind {CAst.loc;v=qid} =
   try
     if kind == ModType then raise Not_found;
     let mp = Nametab.locate_module qid in
-    Dumpglob.dump_modref ?loc mp "modtype"; (mp,Module)
+    (* Dumpglob.dump_modref ?loc mp "modtype"; *) (mp,Module)
   with Not_found ->
     try
       if kind == Module then raise Not_found;
       let mp = Nametab.locate_modtype qid in
-      Dumpglob.dump_modref ?loc mp "mod"; (mp,ModType)
+      (* Dumpglob.dump_modref ?loc mp "mod"; *) (mp,ModType)
     with Not_found -> error_not_a_module_loc kind loc qid
 
 let lookup_module lqid = fst (lookup_module_or_modtype Module lqid)

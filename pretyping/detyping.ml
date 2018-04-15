@@ -565,8 +565,8 @@ and detype_r d flags avoid env sigma t =
         let d1 = detype d flags avoid env sigma c1 in
 	let d2 = detype d flags avoid env sigma c2 in
     let cast = match k with
-    | VMcast -> CastVM d2
-    | NATIVEcast -> CastNative d2
+    (* | VMcast -> CastVM d2 *)
+    (* | NATIVEcast -> CastNative d2 *)
     | _ -> CastConv d2
     in
 	GCast(d1,cast)

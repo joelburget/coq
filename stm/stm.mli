@@ -55,7 +55,9 @@ type stm_init_options = {
 
   (* Initial load path in scope for the document. Usually extracted
      from -R options / _CoqProject *)
+  (*
   iload_path   : Mltop.coq_path list;
+  *)
 
   (* Require [require_libs] before the initial state is
      ready. Parameters follow [Library], that is to say,
@@ -133,7 +135,9 @@ val join : doc:doc -> doc
    - if the worker proof is not empty, then it waits until all workers
      are done with their current jobs and then dumps (or fails if one
      of the completed tasks is a failure) *)
+(*
 val snapshot_vio : doc:doc -> DirPath.t -> string -> doc
+*)
 
 (* Empties the task queue, can be used only if the worker pool is empty (E.g.
  * after having built a .vio in batch mode *)
@@ -143,9 +147,11 @@ val reset_task_queue : unit -> unit
 type tasks
 val check_task : string -> tasks -> int -> bool
 val info_tasks : tasks -> (string * float * int) list
+(*
 val finish_tasks : string ->
   Library.seg_univ -> Library.seg_discharge -> Library.seg_proofs ->
     tasks -> Library.seg_univ * Library.seg_proofs
+    *)
 
 (* Id of the tip of the current branch *)
 val get_current_state : doc:doc -> Stateid.t
@@ -155,7 +161,7 @@ val get_ldir : doc:doc -> Names.DirPath.t
 val get_ast : doc:doc -> Stateid.t -> (Vernacexpr.vernac_control Loc.located) option
 
 (* Filename *)
-val set_compilation_hints : string -> unit
+(* val set_compilation_hints : string -> unit *)
 
 (* Reorders the task queue putting forward what is in the perspective *)
 val set_perspective : doc:doc -> Stateid.t list -> unit

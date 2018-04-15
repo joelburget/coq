@@ -59,7 +59,7 @@ let rec find_and_remove_assoc (i : int) = function
 
 let iraise e =
   let () = Mutex.lock lock in
-  let id = Thread.id (Thread.self ()) in
+  let id = 1 in
   let () = current := (id, e) :: remove_assoc id !current in
   let () = Mutex.unlock lock in
   raise (fst e)
@@ -67,20 +67,20 @@ let iraise e =
 let raise ?info e = match info with
 | None ->
   let () = Mutex.lock lock in
-  let id = Thread.id (Thread.self ()) in
+  let id = 1 in
   let () = current := remove_assoc id !current in
   let () = Mutex.unlock lock in
   raise e
 | Some i ->
   let () = Mutex.lock lock in
-  let id = Thread.id (Thread.self ()) in
+  let id = 1 in
   let () = current := (id, (e, i)) :: remove_assoc id !current in
   let () = Mutex.unlock lock in
   raise e
 
 let find_and_remove () =
   let () = Mutex.lock lock in
-  let id = Thread.id (Thread.self ()) in
+  let id = 1 in
   let (v, l) = find_and_remove_assoc id !current in
   let () = current := l in
   let () = Mutex.unlock lock in

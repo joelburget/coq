@@ -97,8 +97,10 @@ let remove_ids_and_lets env s ids =
      (no_body id ||
        Id.Set.exists not_ids (Id.Set.filter no_body (deps id)))) s)
 
+    (*
 let record_proof_using expr =
   Aux_file.record_in_aux "suggest_proof_using" expr
+  *)
 
 (* Variables in [skip] come from after the definition, so don't count
    for "All". Used in the variable case since the env contains the
@@ -137,11 +139,13 @@ let suggest_common env ppid used ids_typ skip =
     str"The proof of "++ ppid ++ spc() ++
     str "should start with one of the following commands:"++spc()++
     v 0 (
-    prlist_with_sep cut (fun x->str"Proof using " ++x++ str". ") !valid_exprs));
+    prlist_with_sep cut (fun x->str"Proof using " ++x++ str". ") !valid_exprs))
+  (*
   if !Flags.record_aux_file
   then
     let s = string_of_ppcmds (prlist_with_sep (fun _ -> str";")  (fun x->x) !valid_exprs) in
     record_proof_using s
+  *)
 
 let suggest_proof_using = ref false
 

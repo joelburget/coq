@@ -89,6 +89,7 @@ let set_status ~name status =
          with Not_found -> ()
 
 let split_flags s =
+  if s == "" then [] else (* joel: big hack -- actually fix split *)
   let reg = Str.regexp "[ ,]+" in Str.split reg s
 
 (** [cut_before_all_rev] removes all flags subsumed by a later occurrence of the

@@ -1070,14 +1070,15 @@ let rec pretype k0 resolve_tc (tycon : type_constraint) (env : ExtraEnv.t) evdre
       | CastCoerce ->
 	let cj = pretype empty_tycon env evdref lvar c in
 	  evd_comb1 (Coercion.inh_coerce_to_base ?loc env.ExtraEnv.env) evdref cj
-      | CastConv t | CastVM t | CastNative t ->
-	let k = (match k with CastVM _ -> VMcast | CastNative _ -> NATIVEcast | _ -> DEFAULTcast) in
+      | CastConv t (* | CastVM t | CastNative t *) ->
+        let k = (match k with (* CastVM _ -> VMcast | CastNative _ -> NATIVEcast | *) _ -> DEFAULTcast) in
 	let tj = pretype_type empty_valcon env evdref lvar t in
         let tval = evd_comb1 (Evarsolve.refresh_universes
                              ~onlyalg:true ~status:Evd.univ_flexible (Some false) env.ExtraEnv.env)
                           evdref tj.utj_val in
 	let tval = nf_evar !evdref tval in
 	let cj, tval = match k with
+        (*
 	  | VMcast ->
  	    let cj = pretype empty_tycon env evdref lvar c in
 	    let cty = nf_evar !evdref cj.uj_type and tval = nf_evar !evdref tval in

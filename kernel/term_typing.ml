@@ -385,7 +385,7 @@ let record_aux env s_ty s_bo =
           if List.exists (NamedDecl.get_id %> Id.equal id) in_ty then None
           else Some (Id.to_string id))
         (keep_hyps env s_bo)) in
-  Aux_file.record_in_aux "context_used" v
+  () (* Aux_file.record_in_aux "context_used" v *)
 
 let build_constant_declaration kn env result =
   let open Cooking in
@@ -431,13 +431,15 @@ let build_constant_declaration kn env result =
                 (Opaqueproof.force_proof (opaque_tables env) lc) in
             (* we force so that cst are added to the env immediately after *)
             ignore(Opaqueproof.force_constraints (opaque_tables env) lc);
-            if !Flags.record_aux_file then record_aux env ids_typ vars;
+            (* if !Flags.record_aux_file then record_aux env ids_typ vars; *)
             vars
         in
         keep_hyps env (Id.Set.union ids_typ ids_def), def
     | None ->
+        (*
         if !Flags.record_aux_file then
           record_aux env Id.Set.empty Id.Set.empty;
+        *)
         [], def (* Empty section context: no need to check *)
     | Some declared ->
         (* We use the declared set and chain a check of correctness *)
@@ -460,7 +462,7 @@ let build_constant_declaration kn env result =
   let tps = 
     let res =
       match result.cook_proj with
-      | None -> compile_constant_body env univs def
+      (* | None -> compile_constant_body env univs def *)
       | Some pb ->
 	(* The compilation of primitive projections is a bit tricky, because
            they refer to themselves (the body of p looks like fun c =>
@@ -473,21 +475,22 @@ let build_constant_declaration kn env result =
 	    const_body = def;
 	    const_type = typ;
 	    const_proj = result.cook_proj;
-	    const_body_code = None;
+            (* const_body_code = None; *)
 	    const_universes = univs;
 	    const_inline_code = result.cook_inline;
 	    const_typing_flags = Environ.typing_flags env;
 	    }
 	in
 	let env = add_constant kn cb env in
-	compile_constant_body env univs def
+  () in () in
+        (* compile_constant_body env univs def
     in Option.map Cemitcodes.from_val res
-  in
+  in *)
   { const_hyps = hyps;
     const_body = def;
     const_type = typ;
     const_proj = result.cook_proj;
-    const_body_code = tps;
+    (* const_body_code = tps; *)
     const_universes = univs;
     const_inline_code = result.cook_inline;
     const_typing_flags = Environ.typing_flags env }
@@ -622,6 +625,7 @@ let translate_local_def env id centry =
   } in
   let decl = infer_declaration ~trust:Pure env (DefinitionEntry centry) in
   let typ = decl.cook_type in
+  (*
   if Option.is_empty decl.cook_context && !Flags.record_aux_file then begin
     match decl.cook_body with
     | Undef _ -> ()
@@ -632,6 +636,7 @@ let translate_local_def env id centry =
          (Opaqueproof.force_proof (opaque_tables env) lc) in
        record_aux env ids_typ ids_def
   end;
+  *)
   let () = match decl.cook_universes with
   | Monomorphic_const ctx -> assert (Univ.ContextSet.is_empty ctx)
   | Polymorphic_const _ -> assert false

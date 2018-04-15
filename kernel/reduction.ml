@@ -331,7 +331,7 @@ let rec ccnv cv_pb l2r infos lft1 lft2 term1 term2 cuniv =
 
 (* Conversion between [lft1](hd1 v1) and [lft2](hd2 v2) *)
 and eqappr cv_pb l2r infos (lft1,st1) (lft2,st2) cuniv =
-  Control.check_for_interrupt ();
+  (* Control.check_for_interrupt (); *)
   (* First head reduce both terms *)
   let ninfos = infos_with_reds infos.cnv_inf betaiotazeta in
   let (hd1, v1 as appr1) = whd_stack ninfos infos.lft_tab (fst st1) (snd st1) in

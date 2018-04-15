@@ -45,4 +45,4 @@ val set_strategy :
   bool -> (Conv_oracle.level * evaluable_global_reference list) list -> unit
 
 (** call by value normalisation function using the virtual machine *)
-val cbv_vm : reduction_function
+(* val cbv_vm : reduction_function *)

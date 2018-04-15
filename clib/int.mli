@@ -12,9 +12,9 @@
 
 type t = int
 
-external equal : t -> t -> bool = "%eq"
+val equal : t -> t -> bool
 
-external compare : t -> t -> int = "caml_int_compare"
+val compare : t -> t -> int
 
 val hash : t -> int
 

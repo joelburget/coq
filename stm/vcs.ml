@@ -113,7 +113,7 @@ let add_node vcs id edges =
   { vcs with dag =
      List.fold_left (fun g (t,tgt) -> Dag.add_edge g id t tgt) vcs.dag edges }
 
-let get_branch vcs head =
+let get_branch vcs head = Js.log3 "getting branch" vcs head;
   try BranchMap.find head vcs.heads
   with Not_found -> anomaly (str"head " ++ str head ++ str" not found.")
 

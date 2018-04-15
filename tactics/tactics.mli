@@ -124,8 +124,8 @@ val intros_patterns : evars_flag -> intro_patterns -> unit Proofview.tactic
 
 val assumption       : unit Proofview.tactic
 val exact_no_check   : constr -> unit Proofview.tactic
-val vm_cast_no_check : constr -> unit Proofview.tactic
-val native_cast_no_check : constr -> unit Proofview.tactic
+(* val vm_cast_no_check : constr -> unit Proofview.tactic
+val native_cast_no_check : constr -> unit Proofview.tactic *)
 val exact_check      : constr -> unit Proofview.tactic
 val exact_proof      : Constrexpr.constr_expr -> unit Proofview.tactic
 
@@ -157,7 +157,7 @@ val simpl_option      : goal_location -> unit Proofview.tactic
 val normalise_in_concl : unit Proofview.tactic
 val normalise_in_hyp  : hyp_location -> unit Proofview.tactic
 val normalise_option  : goal_location -> unit Proofview.tactic
-val normalise_vm_in_concl : unit Proofview.tactic
+(* val normalise_vm_in_concl : unit Proofview.tactic *)
 val unfold_in_concl   :
   (occurrences * evaluable_global_reference) list -> unit Proofview.tactic
 val unfold_in_hyp     :

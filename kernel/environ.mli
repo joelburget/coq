@@ -253,7 +253,7 @@ type unsafe_type_judgment = types punsafe_type_judgment
 
 (** {6 Compilation of global declaration } *)
 
-val compile_constant_body : env -> constant_universes -> constant_def -> Cemitcodes.body_code option
+(* val compile_constant_body : env -> constant_universes -> constant_def -> Cemitcodes.body_code option *)
 
 exception Hyp_not_found
 
@@ -268,6 +268,7 @@ val remove_hyps : Id.Set.t -> (Context.Named.Declaration.t -> Context.Named.Decl
 
 
 
+(*
 open Retroknowledge
 (** functions manipulating the retroknowledge 
     @author spiwack *)
@@ -276,6 +277,7 @@ val retroknowledge : (retroknowledge->'a) -> env -> 'a
 val registered : env -> field -> bool
 
 val register : env -> field -> Retroknowledge.entry -> env
+*)
 
 (** Native compiler *)
 val no_link_info : Pre_env.link_info

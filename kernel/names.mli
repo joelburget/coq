@@ -527,7 +527,7 @@ val hcons_construct : constructor -> constructor
 type 'a tableKey =
   | ConstKey of 'a
   | VarKey of Id.t
-  | RelKey of Int.t
+  | RelKey of int
 
 (** Sets of names *)
 type transparent_state = Id.Pred.t * Cpred.t

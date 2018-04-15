@@ -108,7 +108,13 @@ module Make(T : Task) () = struct
     let open Feedback in
     feedback ~id:Stateid.initial (WorkerStatus(id, s))
 
-  module Worker = Spawn.Sync ()
+  (* module Worker = Spawn.Sync () *)
+  module Worker = struct
+    type process
+    let spawn    _ = failwith "unimplemented: Worker.spawn"
+    let kill     _ = failwith "unimplemented: Worker.kill"
+    let is_alive _ = failwith "unimplemented: Worker.is_alive"
+  end
 
   module Model = struct
 
@@ -133,7 +139,7 @@ module Make(T : Task) () = struct
         | x::tl -> x :: set_slave_opt tl in
       let args =
         Array.of_list (set_slave_opt (List.tl (Array.to_list Sys.argv))) in
-      let env = Array.append (T.extra_env ()) (Unix.environment ()) in
+      let env = (*Array.append*) (T.extra_env ()) (*Unix.environment ()*) in
     Worker.spawn ~env Sys.argv.(0) args in
     name, proc, CThread.prepare_in_channel_for_thread_friendly_io ic, oc
 
@@ -163,13 +169,15 @@ module Make(T : Task) () = struct
       got_token := true;
       stm_prerr_endline ("got execution token") in
     let kill proc =
-      Worker.kill proc;
+      Worker.kill proc in
+      (*
       stm_prerr_endline ("Worker exited: " ^
         match Worker.wait proc with
         | Unix.WEXITED 0x400 -> "exit code unavailable"
         | Unix.WEXITED i -> Printf.sprintf "exit(%d)" i
         | Unix.WSIGNALED sno -> Printf.sprintf "signalled(%d)" sno
         | Unix.WSTOPPED sno -> Printf.sprintf "stopped(%d)" sno) in
+      *)
     let more_univs n =
       CList.init n (fun _ -> Universes.new_univ_id ()) in
 
@@ -180,7 +188,7 @@ module Make(T : Task) () = struct
         let () = TQueue.broadcast queue in
         Worker.kill proc
       else
-        let () = Unix.sleep 1 in
+        (* let () = Unix.sleep 1 in *)
         kill_if ()
     in
     let kill_if () =

@@ -127,9 +127,9 @@ type safe_environment =
     future_cst : Univ.ContextSet.t Future.computation list;
     engagement : engagement option;
     required : vodigest DPMap.t;
-    loads : (ModPath.t * module_body) list;
-    local_retroknowledge : Retroknowledge.action list;
-    native_symbols : Nativecode.symbols DPMap.t }
+    loads : (ModPath.t * module_body) list; }
+    (* local_retroknowledge : Retroknowledge.action list; }
+    native_symbols : Nativecode.symbols DPMap.t } *)
 
 and modvariant =
   | NONE
@@ -156,9 +156,9 @@ let empty_environment =
     univ = Univ.ContextSet.empty;
     engagement = None;
     required = DPMap.empty;
-    loads = [];
-    local_retroknowledge = [];
-    native_symbols = DPMap.empty }
+    loads = []; }
+    (* local_retroknowledge = []; }
+    native_symbols = DPMap.empty } *)
 
 let is_initial senv =
   match senv.revstruct, senv.modvariant with
@@ -568,9 +568,12 @@ let add_modtype l params_mte inl senv =
 
 let full_add_module mb senv =
   let senv = add_constraints (Now (false, mb.mod_constraints)) senv in
+  (*
   let dp = ModPath.dp mb.mod_mp in
   let linkinfo = Nativecode.link_info_of_dirpath dp in
   { senv with env = Modops.add_linked_module mb linkinfo senv.env }
+  *)
+  senv
 
 let full_add_module_type mp mt senv =
   let senv = add_constraints (Now (false, mt.mod_constraints)) senv in
@@ -662,8 +665,8 @@ let build_module_body params restype senv =
     Mod_typing.finalize_module senv.env senv.modpath
       (struc,None,senv.modresolver,senv.univ) restype'
   in
-  let mb' = functorize_module params mb in
-  { mb' with mod_retroknowledge = ModBodyRK senv.local_retroknowledge }
+  let mb' = functorize_module params mb in mb'
+  (* { mb' with mod_retroknowledge = ModBodyRK senv.local_retroknowledge } *)
 
 (** Returning back to the old pre-interactive-module environment,
     with one extra component and some updated fields
@@ -692,10 +695,12 @@ let propagate_senv newdef newenv newresolver senv oldsenv =
     (* engagement is propagated to the upper level *)
     engagement = senv.engagement;
     required = senv.required;
-    loads = senv.loads@oldsenv.loads;
+    loads = senv.loads@oldsenv.loads; }
+    (*
     local_retroknowledge =
-            senv.local_retroknowledge@oldsenv.local_retroknowledge;
+            senv.local_retroknowledge@oldsenv.local_retroknowledge; }
     native_symbols = senv.native_symbols}
+    *)
 
 let end_module l restype senv =
   let mp = senv.modpath in
@@ -725,8 +730,8 @@ let build_mtb mp sign cst delta =
     mod_type = sign;
     mod_type_alg = None;
     mod_constraints = cst;
-    mod_delta = delta;
-    mod_retroknowledge = ModTypeRK }
+    mod_delta = delta; }
+    (* mod_retroknowledge = ModTypeRK } *)
 
 let end_modtype l senv =
   let mp = senv.modpath in
@@ -793,6 +798,7 @@ let add_include me is_module inl senv =
 
 (** {6 Libraries, i.e. compiled modules } *)
 
+  (*
 type compiled_library = {
   comp_name : DirPath.t;
   comp_mod : module_body;
@@ -845,19 +851,24 @@ let export ?except senv dir =
       mod_retroknowledge = ModBodyRK senv.local_retroknowledge
     }
   in
+  let ast = []
+  (*
   let ast, symbols =
     if !Flags.output_native_objects then
       Nativelibrary.dump_library mp dir senv.env str
     else [], Nativecode.empty_symbols
+  *)
   in
+  (*
   let lib = {
     comp_name = dir;
     comp_mod = mb;
     comp_deps = Array.of_list (DPMap.bindings senv.required);
     comp_enga = Environ.engagement senv.env;
-    comp_natsymbs = symbols }
+    (* comp_natsymbs = symbols *) }
   in
-  mp, lib, ast
+  *)
+  mp, (* lib, *) ast
 
 (* cst are the constraints that were computed by the vi2vo step and hence are
  * not part of the mb.mod_constraints field (but morally should be) *)
@@ -883,7 +894,8 @@ let import lib cst vodigest senv =
     modresolver = Mod_subst.add_delta_resolver mb.mod_delta senv.modresolver;
     required = DPMap.add lib.comp_name vodigest senv.required;
     loads = (mp,mb)::senv.loads;
-    native_symbols = DPMap.add lib.comp_name lib.comp_natsymbs senv.native_symbols }
+    (* native_symbols = DPMap.add lib.comp_name lib.comp_natsymbs senv.native_symbols *) }
+*)
 
 (** {6 Safe typing } *)
 
@@ -896,6 +908,7 @@ let typing senv = Typeops.infer (env_of_senv senv)
 
 (** {6 Retroknowledge / native compiler } *)
 
+(*
 (** universal lifting, used for the "get" operations mostly *)
 let retroknowledge f senv =
   Environ.retroknowledge f (env_of_senv senv)
@@ -909,6 +922,7 @@ let register field value by_clause senv =
     local_retroknowledge =
       Retroknowledge.RKRegister (field,value)::senv.local_retroknowledge
   }
+*)
 
 (* This function serves only for inlining constants in native compiler for now,
 but it is meant to become a replacement for environ.register *)

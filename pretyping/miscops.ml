@@ -16,16 +16,16 @@ open Genredexpr
 
 let map_cast_type f = function
   | CastConv a -> CastConv (f a)
-  | CastVM a -> CastVM (f a)
+  (* | CastVM a -> CastVM (f a) *)
   | CastCoerce -> CastCoerce
-  | CastNative a -> CastNative (f a)
+  (* | CastNative a -> CastNative (f a) *)
 
 let smartmap_cast_type f c =
   match c with
     | CastConv a -> let a' = f a in if a' == a then c else CastConv a'
-    | CastVM a -> let a' = f a in if a' == a then c else CastVM a'
+    (* | CastVM a -> let a' = f a in if a' == a then c else CastVM a' *)
     | CastCoerce -> CastCoerce
-    | CastNative a -> let a' = f a in if a' == a then c else CastNative a'
+    (* | CastNative a -> let a' = f a in if a' == a then c else CastNative a' *)
 
 (** Equalities on [glob_sort] *)
 
@@ -58,7 +58,7 @@ let map_red_expr_gen f g h = function
   | Cbv flags -> Cbv (map_flags g flags)
   | Lazy flags -> Lazy (map_flags g flags)
   | CbvVm occs_o -> CbvVm (Option.map (map_occs (map_union g h)) occs_o)
-  | CbvNative occs_o -> CbvNative (Option.map (map_occs (map_union g h)) occs_o)
+  (* | CbvNative occs_o -> CbvNative (Option.map (map_occs (map_union g h)) occs_o) *)
   | Cbn flags -> Cbn (map_flags g flags)
   | ExtraRedExpr _ | Red _ | Hnf as x -> x
 

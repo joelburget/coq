@@ -59,7 +59,7 @@ type env = {
     env_nb_rel        : int;
     env_stratification : stratification;
     env_typing_flags  : typing_flags;
-    retroknowledge : Retroknowledge.retroknowledge;
+    (* retroknowledge : Retroknowledge.retroknowledge; *)
     indirect_pterms : Opaqueproof.opaquetab;
 }
 

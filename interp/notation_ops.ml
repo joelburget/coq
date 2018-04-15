@@ -1078,15 +1078,15 @@ let match_termlist match_fun alp metas sigma rest x y iter termin revert =
 
 let match_cast match_fun sigma c1 c2 =
   match c1, c2 with
-  | CastConv t1, CastConv t2
-  | CastVM t1, CastVM t2
-  | CastNative t1, CastNative t2 ->
+  | CastConv t1, CastConv t2 ->
+  (* | CastVM t1, CastVM t2
+  | CastNative t1, CastNative t2 -> *)
     match_fun sigma t1 t2
   | CastCoerce, CastCoerce ->
     sigma
   | CastConv _, _
-  | CastVM _, _
-  | CastNative _, _
+  (* | CastVM _, _
+  | CastNative _, _ *)
   | CastCoerce, _ -> raise No_match
 
 let does_not_come_from_already_eta_expanded_var glob =

@@ -71,6 +71,7 @@ type library_name = DirPath.t
 
 type library_objects
 
+(*
 val register_library :
   library_name ->
   Safe_typing.compiled_library -> library_objects -> Safe_typing.vodigest ->
@@ -83,15 +84,17 @@ val start_library : library_name -> unit
 val end_library :
   ?except:Future.UUIDSet.t -> library_name ->
     Safe_typing.compiled_library * library_objects * Safe_typing.native_library
+*)
 
 (** append a function to be executed at end_library *)
-val append_end_library_hook : (unit -> unit) -> unit
+(* val append_end_library_hook : (unit -> unit) -> unit *)
 
 (** [really_import_module mp] opens the module [mp] (in a Caml sense).
    It modifies Nametab and performs the [open_object] function for
    every object of the module. Raises [Not_found] when [mp] is unknown
    or when [mp] corresponds to a functor. *)
 
+(*
 val really_import_module : ModPath.t -> unit
 
 (** [import_module export mp] is a synchronous version of
@@ -99,6 +102,7 @@ val really_import_module : ModPath.t -> unit
    opened every time the module containing it is. *)
 
 val import_module : bool -> ModPath.t -> unit
+*)
 
 (** Include  *)
 

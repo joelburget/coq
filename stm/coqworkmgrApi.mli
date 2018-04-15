@@ -38,7 +38,7 @@ type response =
   | Noluck
   | Pong of int * int * int (* cur, max, pid *)
 
-val connect : string -> Unix.file_descr option
+(* val connect : string -> Unix.file_descr option *)
 
 exception ParseError
 

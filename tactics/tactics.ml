@@ -686,7 +686,7 @@ let bind_red_expr_occurrences occs nbcl redexp =
 	  error_illegal_clause ()
 	else
 	  Simpl (f,Some (occs,c))
-    | CbvVm (Some (occl,c)) ->
+    (*| CbvVm (Some (occl,c)) ->
         if occl != AllOccurrences then
           error_illegal_clause ()
         else
@@ -695,9 +695,9 @@ let bind_red_expr_occurrences occs nbcl redexp =
         if occl != AllOccurrences then
           error_illegal_clause ()
         else
-          CbvNative (Some (occs,c))
+          CbvNative (Some (occs,c))*)
     | Red _ | Hnf | Cbv _ | Lazy _ | Cbn _
-    | ExtraRedExpr _ | Fold _ | Simpl (_,None) | CbvVm None | CbvNative None ->
+    | ExtraRedExpr _ | Fold _ | Simpl (_,None) (*| CbvVm None | CbvNative None *) ->
 	error_occurrences_not_unsupported ()
     | Unfold [] | Pattern [] ->
 	assert false
@@ -884,7 +884,7 @@ let simpl_option        = reduct_option   (simpl,REVERTcast)
 let normalise_in_concl  = reduct_in_concl (compute,REVERTcast)
 let normalise_in_hyp    = reduct_in_hyp    compute
 let normalise_option    = reduct_option   (compute,REVERTcast)
-let normalise_vm_in_concl = reduct_in_concl (Redexpr.cbv_vm,VMcast)
+(* let normalise_vm_in_concl = reduct_in_concl (Redexpr.cbv_vm,VMcast) *)
 let unfold_in_concl loccname = reduct_in_concl (unfoldn loccname,REVERTcast)
 let unfold_in_hyp   loccname = reduct_in_hyp   (unfoldn loccname)
 let unfold_option   loccname = reduct_option (unfoldn loccname,DEFAULTcast)
@@ -1905,8 +1905,8 @@ let cast_no_check cast c =
     exact_no_check (mkCast (c, cast, concl))
   end
 
-let vm_cast_no_check c = cast_no_check Term.VMcast c
-let native_cast_no_check c = cast_no_check Term.NATIVEcast c
+(* let vm_cast_no_check c = cast_no_check Term.VMcast c
+let native_cast_no_check c = cast_no_check Term.NATIVEcast c *)
 
 let exact_proof c =
   let open Tacmach.New in

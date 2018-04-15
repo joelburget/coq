@@ -80,7 +80,7 @@ type env = {
   env_nb_rel        : int;
   env_stratification : stratification;
   env_typing_flags  : typing_flags;
-  retroknowledge : Retroknowledge.retroknowledge;
+  (* retroknowledge : Retroknowledge.retroknowledge; *)
   indirect_pterms : Opaqueproof.opaquetab;
 }
 
@@ -107,7 +107,7 @@ let empty_env = {
     env_universes = UGraph.initial_universes;
     env_engagement = PredicativeSet };
   env_typing_flags = Declareops.safe_flags Conv_oracle.empty;
-  retroknowledge = Retroknowledge.initial_retroknowledge;
+  (* retroknowledge = Retroknowledge.initial_retroknowledge; *)
   indirect_pterms = Opaqueproof.empty_opaquetab }
 
 

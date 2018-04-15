@@ -17,7 +17,7 @@ sig
   (** We include the standard library *)
 
   [@@@ocaml.warning "-3"]     (* [@@noalloc] since 4.03.0 GPR#240 *)
-  external equal : string -> string -> bool = "caml_string_equal" "noalloc"
+  val equal : string -> string -> bool
   [@@@ocaml.warning "+3"]
 
   (** Equality on strings *)

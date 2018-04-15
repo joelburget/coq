@@ -534,7 +534,7 @@ type case_info = Constr.case_info =
 [@@ocaml.deprecated "Alias for Constr.case_info"]
 
 type cast_kind = Constr.cast_kind =
-  VMcast | NATIVEcast | DEFAULTcast | REVERTcast
+  (* VMcast | NATIVEcast | *) DEFAULTcast | REVERTcast
 [@@ocaml.deprecated "Alias for Constr.cast_kind"]
 
 type rec_declaration = Constr.rec_declaration
@@ -574,8 +574,10 @@ type ('constr, 'types, 'sort, 'univs) kind_of_term =
   | Proj      of projection * 'constr
 [@@ocaml.deprecated "Alias for Constr.kind_of_term"]
 
+(*
 type values = Vmvalues.values
 [@@ocaml.deprecated "Alias for Vmvalues.values"]
+*)
 
 val hash_constr : Constr.constr -> int
 [@@ocaml.deprecated "Alias for Constr.hash"]

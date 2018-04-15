@@ -966,7 +966,7 @@ let build_inductive env prv iu env_ar paramsctxt kn isrecord isfinite inds nmr r
 	mind_recargs = recarg;
 	mind_nb_constant = !nconst;
 	mind_nb_args = !nblock;
-	mind_reloc_tbl = rtbl;
+        (* mind_reloc_tbl = rtbl; *)
       } in
   let packets = Array.map2 build_one_packet inds recargs in
   let pkt = packets.(0) in

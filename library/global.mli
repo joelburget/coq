@@ -106,12 +106,14 @@ val body_of_constant_body : Declarations.constant_body -> (Constr.constr * Univ.
 
 (** {6 Compiled libraries } *)
 
+(*
 val start_library : DirPath.t -> ModPath.t
 val export : ?except:Future.UUIDSet.t -> DirPath.t ->
   ModPath.t * Safe_typing.compiled_library * Safe_typing.native_library
 val import :
   Safe_typing.compiled_library -> Univ.ContextSet.t -> Safe_typing.vodigest ->
   ModPath.t
+  *)
 
 (** {6 Misc } *)
 
@@ -146,10 +148,12 @@ val universes_of_global : Globnames.global_reference -> Univ.AUContext.t
 
 (** {6 Retroknowledge } *)
 
+(*
 val register :
   Retroknowledge.field -> Constr.constr -> Constr.constr -> unit
 
 val register_inline : Constant.t -> unit
+*)
 
 (** {6 Oracle } *)
 

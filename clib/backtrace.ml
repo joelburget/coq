@@ -26,8 +26,8 @@ type location = {
 
 type frame = { frame_location : location option; frame_raised : bool; }
 
-external get_exception_backtrace: unit -> raw_frame array option
-  = "caml_get_exception_backtrace"
+(* external get_exception_backtrace: unit -> raw_frame array option
+  = "caml_get_exception_backtrace" *)
 
 type t = raw_frame array list
 (** List of partial raw stack frames, in reverse order *)
@@ -58,9 +58,9 @@ let rec repr_aux accu = function
 
 let repr bt = repr_aux [] (List.rev bt)
 
-let push stack = match get_exception_backtrace () with
+let push stack = [] (* match get_exception_backtrace () with
 | None -> []
-| Some frames -> frames :: stack
+| Some frames -> frames :: stack *)
 
 (** Utilities *)
 
@@ -89,9 +89,9 @@ let add_backtrace e =
   if !is_recording then
     (** This must be the first function call, otherwise the stack may be
         destroyed *)
-    let current = get_exception_backtrace () in
-    let info = Exninfo.info e in
-    begin match current with
+    (* let current = get_exception_backtrace () in *)
+    let info = Exninfo.info e in (e, info)
+    (* begin match current with
     | None -> (e, info)
     | Some fragment ->
       let bt = match get_backtrace info with
@@ -100,7 +100,7 @@ let add_backtrace e =
       in
       let bt = fragment :: bt in
       (e, Exninfo.add info backtrace bt)
-    end
+    end *)
   else
     let info = Exninfo.info e in
     (e, info)
