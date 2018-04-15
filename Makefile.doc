@@ -57,22 +57,11 @@ ALLSPHINXOPTS= -d $(SPHINXBUILDDIR)/doctrees $(SPHINXOPTS)
 DOCCOMMON:=doc/common/version.tex doc/common/title.tex doc/common/macros.tex
 
 REFMANCOQTEXFILES:=$(addprefix doc/refman/, \
-  RefMan-gal.v.tex RefMan-ext.v.tex \
-  RefMan-mod.v.tex RefMan-tac.v.tex \
-  RefMan-cic.v.tex RefMan-lib.v.tex \
-  RefMan-tacex.v.tex RefMan-syn.v.tex \
-  RefMan-oth.v.tex RefMan-ltac.v.tex \
-  RefMan-pro.v.tex RefMan-sch.v.tex \
-  Cases.v.tex Coercion.v.tex CanonicalStructures.v.tex Extraction.v.tex \
-  Program.v.tex Omega.v.tex Micromega.v.tex Polynom.v.tex Nsatz.v.tex \
-  Setoid.v.tex Classes.v.tex Universes.v.tex \
-  Misc.v.tex)
+  RefMan-gal.v.tex \
+  RefMan-ltac.v.tex)
 
 REFMANTEXFILES:=$(addprefix doc/refman/, \
-  headers.sty Reference-Manual.tex \
-  RefMan-pre.tex RefMan-int.tex RefMan-com.tex \
-  RefMan-uti.tex RefMan-ide.tex RefMan-modr.tex \
-  AsyncProofs.tex RefMan-ssr.tex) \
+  headers.sty Reference-Manual.tex) \
   $(REFMANCOQTEXFILES) \
 
 REFMANEPSFILES:=doc/refman/coqide.eps doc/refman/coqide-queries.eps

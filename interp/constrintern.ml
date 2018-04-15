@@ -270,7 +270,7 @@ let error_inconsistent_scope ?loc id scopes1 scopes2 =
     pr_scope_stack scopes1)
 
 let error_expect_binder_notation_type ?loc id =
-  user_err ?loc 
+  user_err ?loc
    (Id.print id ++
     str " is expected to occur in binding position in the right-hand side.")
 
@@ -435,7 +435,7 @@ let glob_local_binder_of_extended = DAst.with_loc_val (fun ?loc -> function
       let t = DAst.make ?loc @@ GHole(Evar_kinds.BinderType na,Misctypes.IntroAnonymous,None) in
       (na,bk,Some c,t)
   | GLocalPattern (_,_,_,_) ->
-      Loc.raise ?loc (Stream.Error "pattern with quote not allowed here.")
+      Loc.raise ?loc (Stream.Error "pattern with quote not allowed here")
   )
 
 let intern_cases_pattern_fwd = ref (fun _ -> failwith "intern_cases_pattern_fwd")
@@ -947,7 +947,7 @@ let find_appl_head_data c =
     begin match DAst.get r with
     | GRef (ref,_) when l != [] ->
       let n = List.length l in
-      let impls = implicits_of_global ref in 
+      let impls = implicits_of_global ref in
       let scopes = find_arguments_scope ref in
 	c, List.map (drop_first_implicits n) impls,
 	List.skipn_at_least n scopes,[]
@@ -1360,7 +1360,7 @@ let sort_fields ~complete loc fields completer =
                  let the_proj (idx, glob_id) = eq_gr field_glob_ref (ConstRef glob_id) in
                  try CList.extract_first the_proj remaining_projs
                  with Not_found ->
-                   user_err ?loc 
+                   user_err ?loc
                      (str "This record contains fields of different records.")
                in
                index_fields fields remaining_projs ((field_index, field_value) :: acc)
@@ -1618,7 +1618,7 @@ let drop_notations_pattern looked_for genv =
       let pl = add_local_defs_and_check_length loc genv g pl args in
       DAst.make ?loc @@ RCPatCstr (g, pl @ List.map (in_pat false scopes) args, [])
     | NList (x,y,iter,terminator,revert) ->
-      if not (List.is_empty args) then user_err ?loc 
+      if not (List.is_empty args) then user_err ?loc
         (strbrk "Application of arguments to a recursive notation not supported in patterns.");
       (try
          (* All elements of the list are in scopes (scopt,subscopes) *)
@@ -1749,7 +1749,7 @@ let extract_explicit_arg imps args =
 	  let id = match pos with
 	  | ExplByName id ->
 	      if not (exists_implicit_name id imps) then
-		user_err ?loc 
+		user_err ?loc
 		  (str "Wrong argument name: " ++ Id.print id ++ str ".");
 	      if Id.Map.mem id eargs then
 		user_err ?loc  (str "Argument name " ++ Id.print id
@@ -1762,7 +1762,7 @@ let extract_explicit_arg imps args =
 		  if not (is_status_implicit imp) then failwith "imp";
 		  name_of_implicit imp
 		with Failure _ (* "nth" | "imp" *) ->
-		  user_err ?loc 
+		  user_err ?loc
 		    (str"Wrong argument position: " ++ int p ++ str ".")
 	      in
 	      if Id.Map.mem id eargs then
@@ -1816,7 +1816,7 @@ let internalize globalenv env pattern_mode (_, ntnvars as lvar) c =
 	     let bl = List.rev (List.map glob_local_binder_of_extended rbl) in
              ((n, ro), bl, intern_type env' ty, env')) dl in
         let idl = Array.map2 (fun (_,_,_,_,bd) (a,b,c,env') ->
-	     let env'' = List.fold_left_i (fun i en name -> 
+	     let env'' = List.fold_left_i (fun i en name ->
 					     let (_,bli,tyi,_) = idl_temp.(i) in
 					     let fix_args = (List.map (fun (na, bk, _, _) -> (build_impls bk na)) bli) in
 					       push_name_env ntnvars (impls_type_list ~args:fix_args tyi)
@@ -1886,8 +1886,8 @@ let internalize globalenv env pattern_mode (_, ntnvars as lvar) c =
     | CAppExpl ((isproj,ref,us), args) ->
         let (f,_,args_scopes,_),args =
 	  let args = List.map (fun a -> (a,None)) args in
-	  intern_applied_reference intern env (Environ.named_context globalenv) 
-	    lvar us args ref 
+	  intern_applied_reference intern env (Environ.named_context globalenv)
+	    lvar us args ref
 	in
 	  (* Rem: GApp(_,f,[]) stands for @f *)
 	DAst.make ?loc @@
@@ -1902,7 +1902,7 @@ let internalize globalenv env pattern_mode (_, ntnvars as lvar) c =
           | _ -> f,args in
 	let (c,impargs,args_scopes,l),args =
           match f.CAst.v with
-            | CRef (ref,us) -> 
+            | CRef (ref,us) ->
 	       intern_applied_reference intern env
 		 (Environ.named_context globalenv) lvar us args ref
             | CNotation (ntn,([],[],[],[])) ->

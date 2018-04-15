@@ -479,7 +479,8 @@ and extern_notation_pattern (tmp_scope,scopes as allscopes) vars t = function
       if is_inactive_rule keyrule then raise No_match;
       let loc = t.loc in
       match DAst.get t with
-	| PatCstr (cstr,_,na) ->
+        | PatCstr (cstr,args,na) ->
+          let t = if na = Anonymous then t else DAst.make ?loc (PatCstr (cstr,args,Anonymous)) in
 	  let p = apply_notation_to_pattern ?loc (ConstructRef cstr)
 	    (match_notation_constr_cases_pattern t pat) allscopes vars keyrule in
 	  insert_pat_alias ?loc p na
@@ -590,11 +591,17 @@ let explicitize inctx impl (cf,f) args =
   let expl () = 
     match ip with
     | Some i ->
-      if not (List.is_empty impl) && is_status_implicit (List.nth impl (i-1)) then
-	raise Expl
+      (* Careful: It is possible to have declared implicits ending
+         before the principal argument *)
+      let is_impl =
+        try is_status_implicit (List.nth impl (i-1))
+        with Failure _ -> false
+      in
+      if is_impl
+      then raise Expl
       else
 	let (args1,args2) = List.chop i args in
-	let (impl1,impl2) = if List.is_empty impl then [],[] else List.chop i impl in
+        let (impl1,impl2) = try List.chop i impl with Failure _ -> impl, [] in
 	let args1 = exprec 1 (args1,impl1) in
 	let args2 = exprec (i+1) (args2,impl2) in
 	let ip = Some (List.length args1) in
@@ -912,9 +919,6 @@ let rec extern inctx scopes vars r =
   | GCast (c, c') ->
       CCast (sub_extern true scopes vars c,
 	     Miscops.map_cast_type (extern_typ scopes vars) c')
-  | GProj (p, c) ->
-    let pr = extern_reference ?loc Id.Set.empty (ConstRef (Projection.constant p)) in
-    CProj (pr, sub_extern inctx scopes vars c)
   ) r'
 
 and extern_typ (_,scopes) =

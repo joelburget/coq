@@ -88,11 +88,9 @@ let rec eq_notation_constr (vars1,vars2 as vars) t1 t2 = match t1, t2 with
   Miscops.glob_sort_eq s1 s2
 | NCast (t1, c1), NCast (t2, c2) ->
   (eq_notation_constr vars) t1 t2 && cast_type_eq (eq_notation_constr vars) c1 c2
-| NProj (p1, c1), NProj (p2, c2) ->
-  Projection.equal p1 p2 && eq_notation_constr vars c1 c2
 | (NRef _ | NVar _ | NApp _ | NHole _ | NList _ | NLambda _ | NProd _
   | NBinderList _ | NLetIn _ | NCases _ | NLetTuple _ | NIf _
-  | NRec _ | NSort _ | NCast _ | NProj _), _ -> false
+  | NRec _ | NSort _ | NCast _), _ -> false
 
 (**********************************************************************)
 (* Re-interpret a notation as a glob_constr, taking care of binders   *)
@@ -210,7 +208,7 @@ let glob_constr_of_notation_constr_with_binders ?loc g f e nc =
       let e',na = protect g e na in
       GIf (f e c,(na,Option.map (f e') po),f e b1,f e b2)
   | NRec (fk,idl,dll,tl,bl) ->
-      let e,dll = Array.fold_left_map (List.fold_map (fun e (na,oc,b) ->
+      let e,dll = Array.fold_left_map (List.fold_left_map (fun e (na,oc,b) ->
           let e,na = protect g e na in
 	  (e,(na,Explicit,Option.map (f e) oc,f e b)))) e dll in
       let e',idl = Array.fold_left_map (to_id (protect g)) e idl in
@@ -219,7 +217,6 @@ let glob_constr_of_notation_constr_with_binders ?loc g f e nc =
   | NSort x -> GSort x
   | NHole (x, naming, arg)  -> GHole (x, naming, arg)
   | NRef x -> GRef (x,None)
-  | NProj (p,c) -> GProj (p, f e c)
 
 let glob_constr_of_notation_constr ?loc x =
   let rec aux () x =
@@ -439,7 +436,6 @@ let notation_constr_and_vars_of_glob_constr recvars a =
      if arg != None then has_ltac := true;
      NHole (w, naming, arg)
   | GRef (r,_) -> NRef r
-  | GProj (p, c) -> NProj (p, aux c)
   | GEvar _ | GPatVar _ ->
       user_err Pp.(str "Existential variables not allowed in notations.")
   ) x
@@ -636,14 +632,6 @@ let rec subst_notation_constr subst bound raw =
       let r1' = subst_notation_constr subst bound r1 in
       let k' = Miscops.smartmap_cast_type (subst_notation_constr subst bound) k in
       if r1' == r1 && k' == k then raw else NCast(r1',k')
-
-  | NProj (p, c) ->
-    let kn = Projection.constant p in
-    let b = Projection.unfolded p in
-    let kn' = subst_constant subst kn in
-    let c' = subst_notation_constr subst bound c in
-    if kn' == kn && c' == c then raw else NProj(Projection.make kn' b, c')
-
 
 let subst_interpretation subst (metas,pat) =
   let bound = List.fold_left (fun accu (id, _) -> Id.Set.add id accu) Id.Set.empty metas in
@@ -1217,12 +1205,9 @@ let rec match_ inner u alp metas sigma a1 a2 =
           match_names metas (alp,sigma) (Name id') na in
       match_in u alp metas sigma (mkGApp a1 (DAst.make @@ GVar id')) b2
 
-  | GProj(p1, t1), NProj(p2, t2) when Projection.equal p1 p2 ->
-    match_in u alp metas sigma t1 t2
-
   | (GRef _ | GVar _ | GEvar _ | GPatVar _ | GApp _ | GLambda _ | GProd _
      | GLetIn _ | GCases _ | GLetTuple _ | GIf _ | GRec _ | GSort _ | GHole _
-     | GCast _ | GProj _ ), _ -> raise No_match
+     | GCast _), _ -> raise No_match
 
 and match_in u = match_ true u
 
@@ -1335,10 +1320,10 @@ let rec match_cases_pattern metas (terms,termlists,(),() as sigma) a1 a2 =
  match DAst.get a1, a2 with
   | r1, NVar id2 when Id.List.mem_assoc id2 metas -> (bind_env_cases_pattern sigma id2 a1),(0,[])
   | PatVar Anonymous, NHole _ -> sigma,(0,[])
-  | PatCstr ((ind,_ as r1),largs,_), NRef (ConstructRef r2) when eq_constructor r1 r2 ->
+  | PatCstr ((ind,_ as r1),largs,Anonymous), NRef (ConstructRef r2) when eq_constructor r1 r2 ->
       let l = try add_patterns_for_params_remove_local_defs r1 largs with Not_found -> raise No_match in
       sigma,(0,l)
-  | PatCstr ((ind,_ as r1),args1,_), NApp (NRef (ConstructRef r2),l2)
+  | PatCstr ((ind,_ as r1),args1,Anonymous), NApp (NRef (ConstructRef r2),l2)
       when eq_constructor r1 r2 ->
       let l1 = try add_patterns_for_params_remove_local_defs r1 args1 with Not_found -> raise No_match in
       let le2 = List.length l2 in

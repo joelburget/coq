@@ -42,6 +42,13 @@ class TacticNotationsToHTMLVisitor(TacticNotationsVisitor):
     def visitHole(self, ctx:TacticNotationsParser.HoleContext):
         tags.span(ctx.ID().getText()[1:], _class="hole")
 
+    def visitMeta(self, ctx:TacticNotationsParser.MetaContext):
+        txt = ctx.METACHAR().getText()[1:]
+        if (txt == "{") or (txt == "}"):
+            tags.span(txt)
+        else:
+            tags.span(txt, _class="meta")
+
     def visitWhitespace(self, ctx:TacticNotationsParser.WhitespaceContext):
         tags.span(" ")          # TODO: no need for a <span> here
 

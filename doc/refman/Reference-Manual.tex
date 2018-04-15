@@ -85,8 +85,6 @@ Options A and B of the licence are {\em not} elected.}
 %END LATEX
 
 %\defaultheaders
-\include{RefMan-int}% Introduction
-\include{RefMan-pre}% Credits
 
 %BEGIN LATEX
 \tableofcontents
@@ -97,53 +95,20 @@ Options A and B of the licence are {\em not} elected.}
 \defaultheaders
 %END LATEX
 \include{RefMan-gal.v}% Gallina
-\include{RefMan-ext.v}% Gallina extensions
-\include{RefMan-lib.v}% The coq library
-\include{RefMan-cic.v}% The Calculus of Constructions
-\include{RefMan-modr}% The module system
 
 
 \part{The proof engine}
-\include{RefMan-oth.v}% Vernacular commands
-\include{RefMan-pro.v}% Proof handling
-\include{RefMan-tac.v}% Tactics and tacticals
 \include{RefMan-ltac.v}% Writing tactics
-\include{RefMan-tacex.v}% Detailed Examples of tactics
 
 \lstset{language=SSR}
 \lstset{moredelim=[is][]{|*}{*|}}
 \lstset{moredelim=*[is][\itshape\rmfamily]{/*}{*/}}
-\include{RefMan-ssr}
-
-\part{User extensions}
-\include{RefMan-syn.v}% The Syntax and the Grammar commands
-%%SUPPRIME \include{RefMan-tus.v}% Writing tactics
-\include{RefMan-sch.v}% The Scheme commands
-
-\part{Practical tools}
-\include{RefMan-com}% The coq commands (coqc coqtop)
-\include{RefMan-uti}% utilities (gallina, do_Makefile, etc)
-\include{RefMan-ide}% Coq IDE
 
 %BEGIN LATEX
 \RefManCutCommand{BEGINADDENDUM=\thepage}
 %END LATEX
 \part{Addendum to the Reference Manual}
 \include{AddRefMan-pre}%
-\include{Cases.v}%
-\include{Coercion.v}%
-\include{CanonicalStructures.v}%
-\include{Classes.v}%
-\include{Omega.v}%
-\include{Micromega.v}
-\include{Extraction.v}%
-\include{Program.v}%
-\include{Polynom.v}%  = Ring
-\include{Nsatz.v}%
-\include{Setoid.v}% Tactique pour les setoides
-\include{AsyncProofs}% Paral-ITP
-\include{Universes.v}% Universe polymorphes
-\include{Misc.v}
 %BEGIN LATEX
 \RefManCutCommand{ENDADDENDUM=\thepage}
 %END LATEX
