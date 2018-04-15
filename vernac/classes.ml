@@ -40,10 +40,10 @@ let _ = Goptions.declare_bool_option {
 
 let typeclasses_db = "typeclass_instances"
 
-let set_typeclass_transparency c local b = 
-  Hints.add_hints local [typeclasses_db] 
+let set_typeclass_transparency c local b =
+  Hints.add_hints local [typeclasses_db]
     (Hints.HintsTransparencyEntry ([c], b))
-    
+
 let _ =
   Hook.set Typeclasses.add_instance_hint_hook
     (fun inst path local info poly ->
@@ -120,7 +120,7 @@ let declare_instance_constant k info global imps ?hook id decl poly sigma term t
     Evd.restrict_universe_context sigma levels
   in
   let uctx = Evd.check_univ_decl ~poly sigma decl in
-  let entry = 
+  let entry =
     Declare.definition_entry ~types:termtype ~univs:uctx term
   in
   let cdecl = (DefinitionEntry entry, kind) in
@@ -149,9 +149,9 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
 	  cl
     | Explicit -> cl, Id.Set.empty
   in
-  let tclass = 
-    if generalize then CAst.make @@ CGeneralization (Implicit, Some AbsPi, tclass) 
-    else tclass 
+  let tclass =
+    if generalize then CAst.make @@ CGeneralization (Implicit, Some AbsPi, tclass)
+    else tclass
   in
   let sigma, k, u, cty, ctx', ctx, len, imps, subst =
     let sigma, (impls, ((env', ctx), imps)) = interp_context_evars env sigma ctx in
@@ -215,7 +215,7 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
 	      mismatched_props env' (List.map snd fs) k.cl_props;
 	    Some (Inl fs)
 	| Some (_, t) -> Some (Inr t)
-	| None -> 
+        | None ->
             if program_mode then Some (Inl [])
 	    else None
       in
@@ -241,15 +241,15 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
 			| Anonymous, _ -> false
                       in
 		       let (loc_mid, c) =
-			 List.find is_id rest 
+                         List.find is_id rest
 		       in
-		       let rest' = 
-			 List.filter (fun v -> not (is_id v)) rest 
+                       let rest' =
+                         List.filter (fun v -> not (is_id v)) rest
 		       in
                        let {CAst.loc;v=mid} = get_id loc_mid in
-			 List.iter (fun (n, _, x) -> 
+                         (* List.iter (fun (n, _, x) ->
 				      if Name.equal n (Name mid) then
-					Option.iter (fun x -> Dumpglob.add_glob ?loc (ConstRef x)) x)
+                                        Option.iter (fun x -> Dumpglob.add_glob ?loc (ConstRef x)) x) *)
 			   k.cl_projs;
 			 c :: props, rest'
 		     with Not_found ->
@@ -306,9 +306,9 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
 		  Typeclasses.declare_instance (Some pri) (not global) (ConstRef cst)
 	      in
 	      let obls, constr, typ =
-		match term with 
-		| Some t -> 
-		  let obls, _, constr, typ = 
+                match term with
+                | Some t ->
+                  let obls, _, constr, typ =
                     Obligations.eterm_obligations env id sigma 0 t termtype
 		  in obls, Some constr, typ
 		| None -> [||], None, termtype
@@ -319,7 +319,7 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
  			~univdecl:decl typ ctx ~kind:(Global,poly,Instance) ~hook obls);
 		id
 	    else
-	      (Flags.silently 
+              (Flags.silently
 	       (fun () ->
                   (* spiwack: it is hard to reorder the actions to do
                      the pretyping after the proof has opened. As a
@@ -346,7 +346,7 @@ let new_instance ?(abstract=false) ?(global=false) ?(refine= !refine_instance)
 	       id)
 	end
       else CErrors.user_err Pp.(str "Unsolved obligations remaining."))
-	
+
 let named_of_rel_context l =
   let open Vars in
   let acc, ctx =
@@ -434,5 +434,5 @@ let context poly l =
         Lib.sections_are_opened () || Lib.is_modtype_strict ()
       in
 	status && nstatus
-  in 
+  in
   List.fold_left fn true (List.rev ctx)

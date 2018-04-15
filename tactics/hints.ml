@@ -153,7 +153,7 @@ type 'a with_metadata = {
 
 type full_hint = hint with_metadata
 
-type hint_entry = global_reference option * 
+type hint_entry = global_reference option *
   raw_hint hint_ast with_uid with_metadata
 
 type import_level = [ `LAX | `WARN | `STRICT ]
@@ -242,18 +242,18 @@ let eq_pri_auto_tactic (_, x) (_, y) = KerName.equal x.code.uid y.code.uid
 
 let add_tac pat t st se =
   match pat with
-  | None -> 
+  | None ->
     if List.exists (eq_pri_auto_tactic t) se.sentry_nopat then se
     else { se with sentry_nopat = List.insert pri_order t se.sentry_nopat }
-  | Some pat -> 
+  | Some pat ->
     if List.exists (eq_pri_auto_tactic t) se.sentry_pat then se
     else { se with
         sentry_pat = List.insert pri_order t se.sentry_pat;
         sentry_bnet = Bounded_net.add st se.sentry_bnet (pat, t); }
 
 let rebuild_dn st se =
-  let dn' = 
-    List.fold_left 
+  let dn' =
+    List.fold_left
       (fun dn (id, t) -> Bounded_net.add (Some st) dn (Option.get t.pat, (id, t)))
       Bounded_net.empty se.sentry_pat
   in
@@ -271,17 +271,17 @@ let is_transparent_gr (ids, csts) = function
   | ConstRef cst -> Cpred.mem cst csts
   | IndRef _ | ConstructRef _ -> false
 
-let strip_params env sigma c = 
+let strip_params env sigma c =
   match EConstr.kind sigma c with
-  | App (f, args) -> 
+  | App (f, args) ->
     (match EConstr.kind sigma f with
     | Const (p,_) ->
       let cb = lookup_constant p env in
 	(match cb.Declarations.const_proj with
-	| Some pb -> 
+        | Some pb ->
 	  let n = pb.Declarations.proj_npars in
 	    if Array.length args > n then
-	      mkApp (mkProj (Projection.make p false, args.(n)), 
+              mkApp (mkProj (Projection.make p false, args.(n)),
 		     Array.sub args (n+1) (Array.length args - (n + 1)))
 	    else c
 	| None -> c)
@@ -291,8 +291,8 @@ let strip_params env sigma c =
 let instantiate_hint env sigma p =
   let mk_clenv (c, cty, ctx) =
     let sigma = Evd.merge_context_set univ_flexible sigma ctx in
-    let cl = mk_clenv_from_env env sigma None (c,cty) in 
-      {cl with templval = 
+    let cl = mk_clenv_from_env env sigma None (c,cty) in
+      {cl with templval =
 	  { cl.templval with rebus = strip_params env sigma cl.templval.rebus };
 	env = empty_env}
   in
@@ -328,11 +328,11 @@ let path_matches hp hints =
     match hp, hints with
     | PathAtom _, [] -> false
     | PathAtom PathAny, (_ :: hints') -> k hints'
-    | PathAtom p, (h :: hints') -> 
+    | PathAtom p, (h :: hints') ->
       if hints_path_atom_eq p h then k hints' else false
-    | PathStar hp', hints -> 
+    | PathStar hp', hints ->
       k hints || aux hp' hints (fun hints' -> aux hp hints' k)
-    | PathSeq (hp, hp'), hints -> 
+    | PathSeq (hp, hp'), hints ->
       aux hp hints (fun hints' -> aux hp' hints' k)
     | PathOr (hp, hp'), hints ->
       aux hp hints k || aux hp' hints k
@@ -361,7 +361,7 @@ let path_seq p p' =
   | PathEpsilon, p' -> p'
   | p, PathEpsilon -> p
   | p, p' -> PathSeq (p, p')
-                    
+
 let rec path_derivate hp hint =
   let rec derivate_atoms hints hints' =
     match hints, hints' with
@@ -373,7 +373,7 @@ let rec path_derivate hp hint =
   in
   match hp with
   | PathAtom PathAny -> PathEpsilon
-  | PathAtom (PathHints grs) -> 
+  | PathAtom (PathHints grs) ->
      (match grs, hint with
       | h :: _, PathAny -> PathEmpty
       | hints, PathHints hints' -> derivate_atoms hints hints'
@@ -381,9 +381,9 @@ let rec path_derivate hp hint =
   | PathStar p -> if path_matches p [hint] then hp else PathEpsilon
   | PathSeq (hp, hp') ->
      let hpder = path_derivate hp hint in
-     if matches_epsilon hp then 
+     if matches_epsilon hp then
        PathOr (path_seq hpder hp', path_derivate hp' hint)
-     else if is_empty hpder then PathEmpty 
+     else if is_empty hpder then PathEmpty
      else path_seq hpder hp'
   | PathOr (hp, hp') ->
      PathOr (path_derivate hp hint, path_derivate hp' hint)
@@ -396,11 +396,11 @@ let rec normalize_path h =
   | PathSeq (PathEmpty, _) | PathSeq (_, PathEmpty) -> PathEmpty
   | PathSeq (PathEpsilon, p) | PathSeq (p, PathEpsilon) -> normalize_path p
   | PathOr (PathEmpty, p) | PathOr (p, PathEmpty) -> normalize_path p
-  | PathOr (p, q) -> 
+  | PathOr (p, q) ->
     let p', q' = normalize_path p, normalize_path q in
       if hints_path_eq p p' && hints_path_eq q q' then h
       else normalize_path (PathOr (p', q'))
-  | PathSeq (p, q) -> 
+  | PathSeq (p, q) ->
     let p', q' = normalize_path p, normalize_path q in
       if hints_path_eq p p' && hints_path_eq q q' then h
       else normalize_path (PathSeq (p', q'))
@@ -419,13 +419,13 @@ let pp_hints_path_gen prg =
     | PathStar (PathAtom PathAny) -> str"_*"
     | PathStar p -> str "(" ++ aux p ++ str")*"
     | PathSeq (p, p') -> aux p ++ spc () ++ aux p'
-    | PathOr (p, p') -> 
+    | PathOr (p, p') ->
      str "(" ++ aux p ++ spc () ++ str"|" ++ cut () ++ spc () ++
      aux p' ++ str ")"
   | PathEmpty -> str"emp"
   | PathEpsilon -> str"eps"
   in aux
-     
+
 let pp_hints_path = pp_hints_path_gen pr_global
 
 let glob_hints_path_atom p =
@@ -530,7 +530,7 @@ struct
   let find key db =
     try Constr_map.find key db.hintdb_map
     with Not_found -> empty_se
- 
+
   let realize_tac secvars (id,tac) =
     if Id.Pred.subset tac.secvars secvars then Some tac
     else
@@ -555,11 +555,11 @@ struct
        (try ignore(head_evar sigma arg); false
                  with Evarutil.NoHeadEvar -> true)
     | ModeOutput -> true
-                               
+
   let matches_mode sigma args mode =
     Array.length mode == Array.length args &&
       Array.for_all2 (match_mode sigma) mode args
-      
+
   let matches_modes sigma args modes =
     if List.is_empty modes then true
     else List.exists (matches_mode sigma args) modes
@@ -576,7 +576,7 @@ struct
   let map_all ~secvars k db =
     let se = find k db in
     merge_entry secvars db se.sentry_nopat se.sentry_pat
-	
+
   (** Precondition: concl has no existentials *)
   let map_auto sigma ~secvars (k,args) concl db =
     let se = find k db in
@@ -643,7 +643,7 @@ struct
 	    match egr with
 	    | EvalVarRef id -> (Id.Pred.add id ids, csts), (Id.Set.add id ids', csts')
 	    | EvalConstRef cst -> (ids, Cpred.add cst csts), (ids', Cset.add cst csts')
-	  in 
+          in
 	  let state, unfs = addunf db.hintdb_state db.hintdb_unfolds in
 	    state, { db with hintdb_unfolds = unfs }, true
       | _ -> db.hintdb_state, db, false
@@ -654,7 +654,7 @@ struct
 
   let add_list env sigma l db = List.fold_left (fun db k -> add_one env sigma k db) db l
 
-  let remove_sdl p sdl = List.smartfilter p sdl 
+  let remove_sdl p sdl = List.smartfilter p sdl
 
   let remove_he st p se =
     let sl1' = remove_sdl p se.sentry_nopat in
@@ -939,9 +939,9 @@ let make_extern pri pat tacast =
      name = PathAny;
      db = None;
      secvars = Id.Pred.empty; (* Approximation *)
-     code = with_uid (Extern tacast) })  
+     code = with_uid (Extern tacast) })
 
-let make_mode ref m = 
+let make_mode ref m =
   let open Term in
   let ty, _ = Global.type_of_global_in_context (Global.env ()) ref in
   let ctx, t = decompose_prod ty in
@@ -949,10 +949,10 @@ let make_mode ref m =
   let m' = Array.of_list m in
     if not (n == Array.length m') then
       user_err ~hdr:"Hint"
-	(pr_global ref ++ str" has " ++ int n ++ 
+        (pr_global ref ++ str" has " ++ int n ++
 	   str" arguments while the mode declares " ++ int (Array.length m'))
     else m'
-      
+
 let make_trivial env sigma poly ?(name=PathAny) r =
   let c,ctx = fresh_global_or_constr env sigma poly r in
   let sigma = Evd.merge_context_set univ_flexible sigma ctx in
@@ -1306,11 +1306,11 @@ let interp_hints poly =
       let constr_hints_of_ind qid =
         let ind = global_inductive_with_alias qid in
 	let mib,_ = Global.lookup_inductive ind in
-        Dumpglob.dump_reference ?loc:qid.CAst.loc "<>" (string_of_reference qid) "ind";
-          List.init (nconstructors ind) 
+        (* Dumpglob.dump_reference ?loc:qid.CAst.loc "<>" (string_of_reference qid) "ind"; *)
+          List.init (nconstructors ind)
 	    (fun i -> let c = (ind,i+1) in
 		      let gr = ConstructRef c in
-			empty_hint_info, 
+                        empty_hint_info,
                         (Declareops.inductive_is_polymorphic mib), true,
 			PathHints [gr], IsGlobRef gr)
       in HintsResolveEntry (List.flatten (List.map constr_hints_of_ind lqid))
@@ -1343,7 +1343,7 @@ let expand_constructor_hints env sigma lems =
   List.map_append (fun (evd,lem) ->
     match EConstr.kind sigma lem with
     | Ind (ind,u) ->
-	List.init (nconstructors ind) 
+        List.init (nconstructors ind)
 		  (fun i ->
 		   let ctx = Univ.ContextSet.diff (Evd.universe_context_set evd)
 						  (Evd.universe_context_set sigma) in
@@ -1369,7 +1369,7 @@ let make_local_hint_db env sigma ts eapply lems =
   let lems = List.map map lems in
   let sign = EConstr.named_context env in
   let ts = match ts with
-    | None -> Hint_db.transparent_state (searchtable_map "core") 
+    | None -> Hint_db.transparent_state (searchtable_map "core")
     | Some ts -> ts
   in
   let hintlist = List.map_append (make_resolve_hyp env sigma) sign in

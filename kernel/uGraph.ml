@@ -634,7 +634,7 @@ let check_smaller g strict u v =
   if strict then
     search_path true arcu arcv g
   else
-    is_prop_arc arcu 
+    is_prop_arc arcu
     || (is_set_arc arcu && not (is_prop_arc arcv))
     || search_path false arcu arcv g
 
@@ -651,12 +651,12 @@ let check_smaller_expr g (u,n) (v,m) =
     | _ -> false
 
 let exists_bigger g ul l =
-  Universe.exists (fun ul' -> 
+  Universe.exists (fun ul' ->
     check_smaller_expr g ul ul') l
 
 let real_check_leq g u v =
   Universe.for_all (fun ul -> exists_bigger g ul v) u
-    
+
 let check_leq g u v =
   Universe.equal u v ||
     is_type0m_univ u ||
@@ -890,8 +890,9 @@ let dump_universes output g =
 
 (** Profiling *)
 
-let merge_constraints = 
-  if Flags.profile then 
+  (*
+let merge_constraints =
+  if Flags.profile then
     let key = CProfile.declare_profile "merge_constraints" in
       CProfile.profile2 key merge_constraints
   else merge_constraints
@@ -901,14 +902,14 @@ let check_constraints =
       CProfile.profile2 key check_constraints
   else check_constraints
 
-let check_eq = 
+let check_eq =
   if Flags.profile then
     let check_eq_key = CProfile.declare_profile "check_eq" in
       CProfile.profile3 check_eq_key check_eq
   else check_eq
 
-let check_leq = 
-  if Flags.profile then 
+let check_leq =
+  if Flags.profile then
     let check_leq_key = CProfile.declare_profile "check_leq" in
       CProfile.profile3 check_leq_key check_leq
   else check_leq
