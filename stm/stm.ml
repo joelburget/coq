@@ -584,7 +584,9 @@ end = struct (* {{{ *)
     let info = get_info id in
     info.n_reached <- info.n_reached + 1
   let goals id n = (get_info id).n_goals <- n
-  let cur_tip () = Js.log3 "getting cur_tip" (current_branch ()) (get_branch_pos (current_branch ())); get_branch_pos (current_branch ())
+  let cur_tip () =
+    Js.log3 "getting cur_tip" (current_branch ()) (get_branch_pos (current_branch ()));
+    get_branch_pos (current_branch ())
 
 
   let proof_nesting () = Vcs_aux.proof_nesting !vcs
@@ -2579,7 +2581,7 @@ let doc_type_module_name (std : stm_doc_type) =
 *)
 
 let init_core () =
-  if !cur_opt.async_proofs_mode = APon then (* Control.enable_thread_delay := true; *)
+  (* if !cur_opt.async_proofs_mode = APon then Control.enable_thread_delay := true; *)
   State.register_root_state ()
 
 let new_doc { doc_type ; (* iload_path; *) require_libs; stm_options } =
