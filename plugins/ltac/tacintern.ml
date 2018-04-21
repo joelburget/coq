@@ -115,7 +115,7 @@ let intern_constr_reference strict ist = function
       (DAst.make @@ GVar id), if strict then None else Some (make @@ CRef (r,None))
   | r ->
       let {loc} as lqid = qualid_of_reference r in
-      DAst.make @@ GRef (locate_global_with_alias lqid,None), 
+      DAst.make @@ GRef (locate_global_with_alias lqid,None),
         if strict then None else Some (make @@ CRef (r,None))
 
 (* Internalize an isolated reference in position of tactic *)
@@ -381,6 +381,7 @@ let intern_typed_pattern_or_ref_with_occurrences ist (l,p) =
 
 (* This seems fairly hacky, but it's the first way I've found to get proper
    globalization of [unfold].  --adamc *)
+(*
 let dump_glob_red_expr = function
   | Unfold occs -> List.iter (fun (_, r) ->
     try
@@ -394,6 +395,7 @@ let dump_glob_red_expr = function
 	  (Smartlocate.smart_global r)
       with e when CErrors.noncritical e -> ()) grf.rConst
   | _ -> ()
+*)
 
 let intern_red_expr ist = function
   | Unfold l -> Unfold (List.map (intern_unfold ist) l)
@@ -405,8 +407,8 @@ let intern_red_expr ist = function
   | Simpl (f,o) ->
     Simpl (intern_flag ist f,
            Option.map (intern_typed_pattern_or_ref_with_occurrences ist) o)
-  | CbvVm o -> CbvVm (Option.map (intern_typed_pattern_or_ref_with_occurrences ist) o)
-  | CbvNative o -> CbvNative (Option.map (intern_typed_pattern_or_ref_with_occurrences ist) o)
+  (* | CbvVm o -> CbvVm (Option.map (intern_typed_pattern_or_ref_with_occurrences ist) o)
+  | CbvNative o -> CbvNative (Option.map (intern_typed_pattern_or_ref_with_occurrences ist) o) *)
   | (Red _ | Hnf | ExtraRedExpr _ as r ) -> r
 
 let intern_in_hyp_as ist lf (id,ipat) =
@@ -527,7 +529,7 @@ let rec intern_atomic lf ist x =
                Option.map (intern_constr_with_bindings ist) el))
   (* Conversion *)
   | TacReduce (r,cl) ->
-      dump_glob_red_expr r;
+      (* dump_glob_red_expr r; *)
       TacReduce (intern_red_expr ist r, clause_app (intern_hyp_location ist) cl)
   | TacChange (None,c,cl) ->
       let is_onhyps = match cl.onhyps with

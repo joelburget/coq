@@ -194,7 +194,7 @@ let pr_constr_pattern t =
 
 let pr_sort sigma s = pr_glob_sort (extern_sort sigma s)
 
-let _ = Termops.set_print_constr 
+let _ = Termops.set_print_constr
   (fun env sigma t -> pr_lconstr_expr (extern_constr ~lax:true false env sigma t))
 
 let pr_in_comment pr x = str "(* " ++ pr x ++ str " *)"
@@ -267,7 +267,7 @@ let pr_universe_ctx_set sigma c =
 
 let pr_universe_ctx sigma ?variance c =
   if !Detyping.print_universes && not (Univ.UContext.is_empty c) then
-    fnl()++pr_in_comment (fun c -> v 0 
+    fnl()++pr_in_comment (fun c -> v 0
       (Univ.pr_universe_context (Termops.pr_evd_level sigma) ?variance c)) c
   else
     mt()
@@ -277,9 +277,9 @@ let pr_constant_universes sigma = function
   | Entries.Polymorphic_const_entry ctx -> pr_universe_ctx sigma ctx
 
 let pr_cumulativity_info sigma cumi =
-  if !Detyping.print_universes 
+  if !Detyping.print_universes
   && not (Univ.UContext.is_empty (Univ.CumulativityInfo.univ_context cumi)) then
-    fnl()++pr_in_comment (fun uii -> v 0 
+    fnl()++pr_in_comment (fun uii -> v 0
       (Univ.pr_cumulativity_info (Termops.pr_evd_level sigma) uii)) cumi
   else
     mt()
@@ -291,7 +291,7 @@ let pr_global_env = pr_global_env
 let pr_global = pr_global_env Id.Set.empty
 
 let pr_puniverses f env (c,u) =
-  f env c ++ 
+  f env c ++
   (if !Constrextern.print_universes then
     str"(*" ++ Univ.Instance.pr Universes.pr_with_global_universes u ++ str"*)"
    else mt ())
@@ -518,7 +518,7 @@ let pr_goal_name sigma g =
 let pr_goal_header nme sigma g =
   let (g,sigma) = Goal.V82.nf_evar sigma g in
   str "subgoal " ++ nme ++ (if should_tag() then pr_goal_tag g else str"")
-  ++ (if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g) else mt ())  
+  ++ (if should_gname() then str " " ++ Pp.surround (pr_existential_key sigma g) else mt ())
 
 (* display the conclusion of a goal *)
 let pr_concl n sigma g =
@@ -629,7 +629,7 @@ let print_evar_constraints gl sigma =
           indices, so we protect the error printing code in this case by giving
           names to every de Bruijn variable in the rel_context of the conversion
           problem. MS: we should rather stop depending on anonymous variables, they
-          can be used to indicate independency. Also, this depends on a strategy for 
+          can be used to indicate independency. Also, this depends on a strategy for
           naming/renaming *)
       Namegen.make_all_name_different env sigma in
     str" " ++
@@ -742,7 +742,7 @@ let default_pr_subgoals ?(pr_first=true)
       default_pr_goal { it = g ; sigma = sigma; }
       ++ (if l=[] then mt () else cut ())
       ++ pr_rec 2 l
-    else 
+    else
       pr_rec 1 (g::l)
   in
   (* Side effect! This has to be made more robust *)
@@ -838,7 +838,7 @@ let pr_open_subgoals ~proof =
             in
             pr_subgoals ~pr_first:false (Some end_cmd) bsigma ~seeds ~shelf ~stack:[] ~unfocused:[] ~goals:bgoals
 	  end
-  | _ -> 
+  | _ ->
      let { Evd.it = bgoals ; sigma = bsigma } = Proof.V82.background_subgoals p in
      let bgoals_focused, bgoals_unfocused = List.partition (fun x -> List.mem x goals) bgoals in
      let unfocused_if_needed = if should_unfoc() then bgoals_unfocused else [] in
@@ -970,7 +970,7 @@ let pr_assumptionset env sigma s =
         let tran = safe_pr_constant env kn ++ safe_pr_ltype typ in
         (v, a, o, tran :: tr)
     in
-    let (vars, axioms, opaque, trans) = 
+    let (vars, axioms, opaque, trans) =
       ContextObjectMap.fold fold s ([], [], [], [])
     in
     let theory =
@@ -1000,7 +1000,7 @@ let pr_assumptionset env sigma s =
     ] in
     prlist_with_sep fnl (fun x -> x) (Option.List.flatten assums)
 
-let xor a b = 
+let xor a b =
   (a && not b) || (not a && b)
 
 let pr_cumulative poly cum =
@@ -1008,7 +1008,7 @@ let pr_cumulative poly cum =
     if cum then str "Cumulative " else str "NonCumulative "
   else mt ()
 
-let pr_polymorphic b = 
+let pr_polymorphic b =
   let print = xor (Flags.is_universe_polymorphism ()) b in
   if print then
     if b then str"Polymorphic " else str"Monomorphic "

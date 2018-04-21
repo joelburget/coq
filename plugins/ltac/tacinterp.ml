@@ -237,7 +237,7 @@ let append_trace trace v =
 
 (* Dynamically check that an argument is a tactic *)
 let coerce_to_tactic loc id v =
-  let fail () = user_err ?loc 
+  let fail () = user_err ?loc
     (str "Variable " ++ Id.print id ++ str " should be bound to a tactic.")
   in
   if has_type v (topwit wit_tacvalue) then
@@ -674,10 +674,10 @@ let interp_red_expr ist env sigma = function
   | Simpl (f,o) ->
      sigma , Simpl (interp_flag ist env sigma f,
 		    Option.map (interp_closed_typed_pattern_with_occurrences ist env sigma) o)
-  | CbvVm o ->
+  (* | CbvVm o ->
     sigma , CbvVm (Option.map (interp_closed_typed_pattern_with_occurrences ist env sigma) o)
   | CbvNative o ->
-    sigma , CbvNative (Option.map (interp_closed_typed_pattern_with_occurrences ist env sigma) o)
+    sigma , CbvNative (Option.map (interp_closed_typed_pattern_with_occurrences ist env sigma) o) *)
   | (Red _ |  Hnf | ExtraRedExpr _ as r) -> sigma , r
 
 let interp_may_eval f ist env sigma = function
@@ -890,7 +890,7 @@ let interp_destruction_arg ist gl arg =
       end
   | keep,ElimOnAnonHyp n as x -> x
   | keep,ElimOnIdent {loc;v=id} ->
-      let error () = user_err ?loc 
+      let error () = user_err ?loc
        (strbrk "Cannot coerce " ++ Id.print id ++
         strbrk " neither to a quantified hypothesis nor to a term.")
       in
@@ -1048,7 +1048,7 @@ and eval_tactic ist tac : unit Proofview.tactic = match tac with
   | TacAtom (loc,t) ->
       let call = LtacAtomCall t in
       push_trace(loc,call) ist >>= fun trace ->
-      Profile_ltac.do_profile "eval_tactic:2" trace
+      (* Profile_ltac.do_profile "eval_tactic:2" trace *)
         (catch_error_tac trace (interp_atomic ist t))
   | TacFun _ | TacLetIn _ -> assert false
   | TacMatchGoal _ | TacMatch _ -> assert false
@@ -1082,7 +1082,7 @@ and eval_tactic ist tac : unit Proofview.tactic = match tac with
   | TacAbstract (t,ido) ->
       let call = LtacMLCall tac in
       push_trace(None,call) ist >>= fun trace ->
-      Profile_ltac.do_profile "eval_tactic:TacAbstract" trace
+      (* Profile_ltac.do_profile "eval_tactic:TacAbstract" trace *)
         (catch_error_tac trace begin
       Proofview.Goal.enter begin fun gl -> Tactics.tclABSTRACT
         (Option.map (interp_ident ist (pf_env gl) (project gl)) ido) (interp_tactic ist t)
@@ -1196,7 +1196,7 @@ and interp_ltac_reference ?loc' mustbetac ist r : Val.t Ftactic.t =
       let extra = TacStore.set extra f_trace trace in
       let ist = { lfun = Id.Map.empty; extra = extra; } in
       let appl = GlbAppl[r,[]] in
-      Profile_ltac.do_profile "interp_ltac_reference" trace ~count_call:false
+      (* Profile_ltac.do_profile "interp_ltac_reference" trace ~count_call:false *)
         (val_interp ~appl ist (Tacenv.interp_ltac r))
 
 and interp_tacarg ist arg : Val.t Ftactic.t =
@@ -1262,7 +1262,7 @@ and interp_app loc ist fv largs : Val.t Ftactic.t =
               let ist = {
                 lfun = newlfun;
                 extra = TacStore.set ist.extra f_trace []; } in
-              Profile_ltac.do_profile "interp_app" trace ~count_call:false
+              (* Profile_ltac.do_profile "interp_app" trace ~count_call:false *)
                 (catch_error_tac trace (val_interp ist body)) >>= fun v ->
               Ftactic.return (name_vfun (push_appl appl largs) v)
             end
@@ -1303,7 +1303,7 @@ and tactic_of_value ist vle =
         lfun = lfun;
         extra = TacStore.set ist.extra f_trace []; } in
       let tac = name_if_glob appl (eval_tactic ist t) in
-      Profile_ltac.do_profile "tactic_of_value" trace (catch_error_tac trace tac)
+      (* Profile_ltac.do_profile "tactic_of_value" trace *) (catch_error_tac trace tac)
   | VFun (appl,_,vmap,vars,_) ->
      let tactic_nm =
        match appl with
@@ -1589,7 +1589,7 @@ and interp_atomic ist tac : unit Proofview.tactic =
   | TacElim (ev,(keep,cb),cbo) ->
       Proofview.Goal.enter begin fun gl ->
         let env = Proofview.Goal.env gl in
-        let sigma = project gl in 
+        let sigma = project gl in
         let sigma, cb = interp_open_constr_with_bindings ist env sigma cb in
         let sigma, cbo = Option.fold_left_map (interp_open_constr_with_bindings ist env) sigma cbo in
         let named_tac =
@@ -1751,7 +1751,7 @@ and interp_atomic ist tac : unit Proofview.tactic =
         in
         let c_interp patvars sigma =
 	  let lfun' = Id.Map.fold (fun id c lfun ->
-	    Id.Map.add id (Value.of_constr c) lfun) 
+	    Id.Map.add id (Value.of_constr c) lfun)
 	    patvars ist.lfun
 	  in
 	  let ist = { ist with lfun = lfun' } in
@@ -1772,7 +1772,7 @@ and interp_atomic ist tac : unit Proofview.tactic =
         let to_catch = function Not_found -> true | e -> CErrors.is_anomaly e in
         let c_interp patvars sigma =
           let lfun' = Id.Map.fold (fun id c lfun ->
-            Id.Map.add id (Value.of_constr c) lfun) 
+            Id.Map.add id (Value.of_constr c) lfun)
             patvars ist.lfun
           in
           let ist = { ist with lfun = lfun' } in

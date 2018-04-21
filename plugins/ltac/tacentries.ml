@@ -683,8 +683,8 @@ let tactic_extend plugin_name tacname ~level sign =
     let id = Names.Id.of_string name in
     let obj () = Tacenv.register_ltac true false id body in
     let () = Tacenv.register_ml_tactic ml_tactic_name [|tac|] in
-    Mltop.declare_cache_obj obj plugin_name
+    () (* Mltop.declare_cache_obj obj plugin_name *)
   | _ ->
   let obj () = add_ml_tactic_notation ml_tactic_name ~level (List.map clause_of_ty_ml sign) in
-  Tacenv.register_ml_tactic ml_tactic_name @@ Array.of_list (List.map eval sign);
-  Mltop.declare_cache_obj obj plugin_name
+  Tacenv.register_ml_tactic ml_tactic_name @@ Array.of_list (List.map eval sign)
+  (* Mltop.declare_cache_obj obj plugin_name *)

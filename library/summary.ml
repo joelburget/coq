@@ -27,7 +27,7 @@ let sum_map = ref String.Map.empty
 let mangle id = id ^ "-SUMMARY"
 let unmangle id = String.(sub id 0 (length id - 8))
 
-let ml_modules = "ML-MODULES"
+(* let ml_modules = "ML-MODULES" *)
 
 let internal_declare_summary fadd sumname sdecl =
   let infun, outfun, tag = Dyn.Easy.make_dyn_tag (mangle sumname) in
@@ -42,12 +42,14 @@ let internal_declare_summary fadd sumname sdecl =
   fadd sumname ddecl;
   tag
 
+  (*
 let declare_ml_modules_summary decl =
   let ml_add _ ddecl = sum_mod := Some ddecl in
   internal_declare_summary ml_add ml_modules decl
 
 let declare_ml_modules_summary decl =
   ignore(declare_ml_modules_summary decl)
+  *)
 
 let declare_summary_tag sumname decl =
   let fadd name ddecl = sum_map := String.Map.add name ddecl !sum_map in
@@ -63,16 +65,16 @@ let declare_summary sumname decl =
 type frozen = {
   summaries : Dyn.t String.Map.t;
   (** Ordered list w.r.t. the first component. *)
-  ml_module : Dyn.t option;
+  (* ml_module : Dyn.t option; *)
   (** Special handling of the ml_module summary. *)
 }
 
-let empty_frozen = { summaries = String.Map.empty; ml_module = None }
+let empty_frozen = { summaries = String.Map.empty; (* ml_module = None *) }
 
 let freeze_summaries ~marshallable : frozen =
   let smap decl = decl.freeze_function marshallable in
   { summaries = String.Map.map smap !sum_map;
-    ml_module = Option.map (fun decl -> decl.freeze_function marshallable) !sum_mod;
+    (* ml_module = Option.map (fun decl -> decl.freeze_function marshallable) !sum_mod; *)
   }
 
 let unfreeze_single name state =
@@ -99,13 +101,13 @@ let warn_summary_out_of_scope =
       name)
     )
 
-let unfreeze_summaries ?(partial=false) { summaries; ml_module } =
+let unfreeze_summaries ?(partial=false) { summaries (*; ml_module *) } =
   (* The unfreezing of [ml_modules_summary] has to be anticipated since it
    * may modify the content of [summaries] by loading new ML modules *)
-  begin match !sum_mod with
+  (* begin match !sum_mod with
   | None -> anomaly (str "Undeclared summary " ++ str ml_modules ++ str ".")
   | Some decl -> Option.iter (fun state -> decl.unfreeze_function state) ml_module
-  end;
+  end; *)
   (** We must be independent on the order of the map! *)
   let ufz name decl =
     try decl.unfreeze_function String.Map.(find name summaries)
@@ -152,12 +154,12 @@ let freeze_summary ~marshallable ?(complement=false) ids =
 
 let unfreeze_summary = String.Map.iter unfreeze_single
 
-let surgery_summary { summaries; ml_module } bits =
+let surgery_summary { summaries (*; ml_module *) } bits =
   let summaries =
     String.Map.fold (fun hash state sum -> String.Map.set hash state sum ) summaries bits in
-  { summaries; ml_module }
+  { summaries (* ; ml_module *) }
 
-let project_summary { summaries; ml_module } ?(complement=false) ids =
+let project_summary { summaries (*; ml_module *) } ?(complement=false) ids =
   String.Map.filter (fun name _ -> complement <> List.(mem name ids)) summaries
 
 let pointer_equal l1 l2 =

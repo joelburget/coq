@@ -584,9 +584,7 @@ end = struct (* {{{ *)
     let info = get_info id in
     info.n_reached <- info.n_reached + 1
   let goals id n = (get_info id).n_goals <- n
-  let cur_tip () =
-    Js.log3 "getting cur_tip" (current_branch ()) (get_branch_pos (current_branch ()));
-    get_branch_pos (current_branch ())
+  let cur_tip () = get_branch_pos (current_branch ())
 
 
   let proof_nesting () = Vcs_aux.proof_nesting !vcs
@@ -3015,7 +3013,6 @@ let parse_sentence ~doc sid pa =
   (* Reach.known_state ~cache:`Yes sid; *)
   let cur_tip = VCS.cur_tip () in
   let real_tip = !State.cur_id in
-  Js.log4 "cur_tip:" cur_tip "real_tip:" real_tip;
   if not (Stateid.equal sid cur_tip) then
     user_err ~hdr:"Stm.parse_sentence"
       (str "Currently, the parsing api only supports parsing at the tip of the document." ++ fnl () ++

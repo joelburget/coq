@@ -2341,7 +2341,7 @@ let interp ?(verbosely=true) ?proof ~st {CAst.loc;v=c} =
       Flags.make_universe_polymorphism polymorphic;
       Obligations.set_program_mode atts.program;
       try
-        vernac_timeout begin fun () ->
+        (* vernac_timeout begin fun () -> *)
           let atts = { atts with polymorphic } in
           if verbosely
           then Flags.verbosely (interp ?proof ~atts ~st) c
@@ -2352,7 +2352,7 @@ let interp ?(verbosely=true) ?proof ~st {CAst.loc;v=c} =
             Flags.program_mode := orig_program_mode;
           if (Flags.is_universe_polymorphism() = polymorphic) then
             Flags.make_universe_polymorphism orig_univ_poly;
-          end
+          (* end *)
         with
         | reraise when
               (match reraise with

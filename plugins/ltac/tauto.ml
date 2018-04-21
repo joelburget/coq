@@ -14,7 +14,7 @@ open Hipattern
 open Names
 open Geninterp
 open Misctypes
-open Ltac_plugin
+(* open Ltac_plugin *)
 open Tacexpr
 open Tacinterp
 open Util
@@ -22,7 +22,7 @@ open Tacticals.New
 open Proofview.Notations
 
 let tauto_plugin = "tauto_plugin"
-let () = Mltop.add_known_module tauto_plugin
+(* let () = Mltop.add_known_module tauto_plugin *)
 
 let assoc_var s ist =
   let v = Id.Map.find (Names.Id.of_string s) ist.lfun in
@@ -255,7 +255,7 @@ let register_tauto_tactic tac name0 args =
   let () = Tacenv.register_ml_tactic name [| tac |] in
   let tac = TacFun (ids, TacML (Loc.tag (entry, []))) in
   let obj () = Tacenv.register_ltac true true (Id.of_string name0) tac in
-  Mltop.declare_cache_obj obj tauto_plugin
+  () (* Mltop.declare_cache_obj obj tauto_plugin *)
 
 let () = register_tauto_tactic is_empty "is_empty" ["tauto_flags"; "X1"]
 let () = register_tauto_tactic is_unit_or_eq "is_unit_or_eq" ["tauto_flags"; "X1"]

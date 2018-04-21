@@ -19,7 +19,7 @@ type marshallable =
 (** Types of global Coq states. The ['a] type should be pure and marshallable by
     the standard OCaml marshalling function. *)
 type 'a summary_declaration = {
-  (** freeze_function [true] is for marshalling to disk. 
+  (** freeze_function [true] is for marshalling to disk.
    *  e.g. lazy must be forced *)
   freeze_function : marshallable -> 'a;
   unfreeze_function : 'a -> unit;
@@ -68,7 +68,7 @@ end
     because its unfreeze may load ML code and hence add summary
     entries.  Thus is has to be recognizable, and handled properly.
    *)
-val declare_ml_modules_summary : 'a summary_declaration -> unit
+(* val declare_ml_modules_summary : 'a summary_declaration -> unit *)
 
 (** For global tables registered statically before the end of coqtop
     launch, the following empty [init_function] could be used. *)

@@ -973,9 +973,8 @@ let dump_extended_global loc = function
   | SynDef sp -> Dumpglob.add_glob_kn ?loc sp
   *)
 
-let intern_extended_global_of_qualid {loc;v=qid} = failwith "unimplemented: intern_extended_global_of_qualid"
-  (*
-  let r = Nametab.locate_extended qid in dump_extended_global loc r; r
+let intern_extended_global_of_qualid {loc;v=qid} =
+  let r = Nametab.locate_extended qid in (*dump_extended_global loc r;*) r
 let intern_reference ref =
   let qid = qualid_of_reference ref in
   let r =
@@ -983,7 +982,6 @@ let intern_reference ref =
     with Not_found -> error_global_not_found qid
   in
   Smartlocate.global_of_extended_global r
-  *)
 
 let sort_info_of_level_info (info: Misctypes.level_info) : (Libnames.reference * int) option =
   match info with
