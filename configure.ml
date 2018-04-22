@@ -653,7 +653,7 @@ let coq_warn_error =
 
 (* Flags used to compile Coq and plugins (via coq_makefile) *)
 let caml_flags =
-  Printf.sprintf "-thread -rectypes %s %s %s %s" coq_warnings coq_annot_flag coq_bin_annot_flag coq_safe_string
+  Printf.sprintf "-thread -rectypes -pp cppo %s %s %s %s" coq_warnings coq_annot_flag coq_bin_annot_flag coq_safe_string
 
 (* Flags used to compile Coq but _not_ plugins (via coq_makefile) *)
 let coq_caml_flags =

@@ -1002,7 +1002,7 @@ let _ =
         (fun (b : 'lconstr) _ (l : 'binders) (loc : Ploc.t) ->
            (fun id ->
               match b.CAst.v with
-                CCast (b', (CastConv t (* | CastVM t | CastNative t *))) ->
+                CCast (b', CastConv t) ->
                   None,
                   DefExpr
                     (id, mkCLambdaN ~loc:((!@) loc) l b',

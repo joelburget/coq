@@ -179,15 +179,15 @@ GEXTEND Gram
     [ "200" RIGHTA
       [ c = binder_constr -> c ]
     | "100" RIGHTA
-      [ c1 = operconstr; "<:"; c2 = binder_constr ->
+      (* [ c1 = operconstr; "<:"; c2 = binder_constr ->
                  CAst.make ~loc:(!@loc) @@ CCast(c1, CastVM c2)
       | c1 = operconstr; "<:"; c2 = SELF ->
                  CAst.make ~loc:(!@loc) @@ CCast(c1, CastVM c2)
       | c1 = operconstr; "<<:"; c2 = binder_constr ->
                  CAst.make ~loc:(!@loc) @@ CCast(c1, CastNative c2)
       | c1 = operconstr; "<<:"; c2 = SELF ->
-                 CAst.make ~loc:(!@loc) @@ CCast(c1, CastNative c2)
-      | c1 = operconstr; ":";c2 = binder_constr ->
+                 CAst.make ~loc:(!@loc) @@ CCast(c1, CastNative c2) *)
+      [ c1 = operconstr; ":";c2 = binder_constr ->
                  CAst.make ~loc:(!@loc) @@ CCast(c1, CastConv c2)
       | c1 = operconstr; ":"; c2 = SELF ->
                  CAst.make ~loc:(!@loc) @@ CCast(c1, CastConv c2)

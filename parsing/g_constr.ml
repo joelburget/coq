@@ -315,32 +315,7 @@ let _ =
       Gramext.action
         (fun (c2 : 'binder_constr) _ (c1 : 'operconstr) (loc : Ploc.t) ->
            ((@@) (CAst.make ~loc:((!@) loc)) (CCast (c1, CastConv c2)) :
-            'operconstr));
-      (*
-      [Gramext.Sself; Gramext.Stoken ("", "<<:"); Gramext.Sself],
-      Gramext.action
-        (fun (c2 : 'operconstr) _ (c1 : 'operconstr) (loc : Ploc.t) ->
-           ((@@) (CAst.make ~loc:((!@) loc)) (CCast (c1, CastNative c2)) :
-            'operconstr));
-      [Gramext.Sself; Gramext.Stoken ("", "<<:");
-       Gramext.Snterm
-         (Gram.Entry.obj (binder_constr : 'binder_constr Gram.Entry.e))],
-      Gramext.action
-        (fun (c2 : 'binder_constr) _ (c1 : 'operconstr) (loc : Ploc.t) ->
-           ((@@) (CAst.make ~loc:((!@) loc)) (CCast (c1, CastNative c2)) :
-            'operconstr));
-      [Gramext.Sself; Gramext.Stoken ("", "<:"); Gramext.Sself],
-      Gramext.action
-        (fun (c2 : 'operconstr) _ (c1 : 'operconstr) (loc : Ploc.t) ->
-           ((@@) (CAst.make ~loc:((!@) loc)) (CCast (c1, CastVM c2)) :
-            'operconstr));
-      [Gramext.Sself; Gramext.Stoken ("", "<:");
-       Gramext.Snterm
-         (Gram.Entry.obj (binder_constr : 'binder_constr Gram.Entry.e))],
-      Gramext.action
-        (fun (c2 : 'binder_constr) _ (c1 : 'operconstr) (loc : Ploc.t) ->
-           ((@@) (CAst.make ~loc:((!@) loc)) (CCast (c1, CastVM c2)) :
-            'operconstr)) *)];
+            'operconstr))];
      Some "99", Some Gramext.RightA, []; Some "90", Some Gramext.RightA, [];
      Some "10", Some Gramext.LeftA,
      [[Gramext.Stoken ("", "@");

@@ -25,7 +25,7 @@ type engagement = set_predicativity
     and constants hiding inductives are implicitely polymorphic when
     applied to parameters, on the universes appearing in the whnf of
     their parameters and their conclusion, in a template style.
-    
+
     In truely universe polymorphic mode, we always use RegularArity.
 *)
 
@@ -34,7 +34,7 @@ type template_arity = {
   template_level : Univ.Universe.t;
 }
 
-type ('a, 'b) declaration_arity = 
+type ('a, 'b) declaration_arity =
   | RegularArity of 'a
   | TemplateArity of 'b
 
@@ -46,7 +46,7 @@ type inline = int option
 (** A constant can have no body (axiom/parameter), or a
     transparent body, or an opaque one *)
 
-(** Projections are a particular kind of constant: 
+(** Projections are a particular kind of constant:
     always transparent. *)
 
 type projection_body = {
@@ -85,7 +85,9 @@ type constant_body = {
     const_hyps : Context.Named.t; (** New: younger hyp at top *)
     const_body : constant_def;
     const_type : types;
-    (* const_body_code : Cemitcodes.to_patch_substituted option; *)
+#ifndef BS
+    const_body_code : Cemitcodes.to_patch_substituted option;
+#endif
     const_universes : constant_universes;
     const_proj : projection_body option;
     const_inline_code : bool;
@@ -267,7 +269,9 @@ and 'a generic_module_body =
       set of all universes constraints in the module  *)
     mod_delta : Mod_subst.delta_resolver; (**
       quotiented set of equivalent constants and inductive names *)
-    (* mod_retroknowledge : 'a module_retroknowledge; *)
+#ifndef BS
+    mod_retroknowledge : 'a module_retroknowledge;
+#endif
     }
 
 (** For a module, there are five possible situations:
@@ -287,12 +291,12 @@ and module_body = module_implementation generic_module_body
 
 and module_type_body = unit generic_module_body
 
-(*
+#ifndef BS
 and _ module_retroknowledge =
 | ModBodyRK :
   Retroknowledge.action list -> module_implementation module_retroknowledge
 | ModTypeRK : unit module_retroknowledge
-*)
+#endif
 
 (** Extra invariants :
 

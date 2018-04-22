@@ -66,7 +66,7 @@ AFTER ?=
 
 world: coq coqide documentation revision
 
-coq: coqlib coqbinaries tools
+coq: coqlib coqbinaries
 
 world.timing.diff: coq.timing.diff
 coq.timing.diff: coqlib.timing.diff
@@ -690,7 +690,7 @@ plugins/%.cmx: plugins/%.ml
 ###########################################################################
 
 # Ocamldep is now used directly again (thanks to -ml-synonym in OCaml >= 3.12)
-OCAMLDEP = $(OCAMLFIND) ocamldep -slash -ml-synonym .ml4 -ml-synonym .mlpack
+OCAMLDEP = $(OCAMLFIND) ocamldep -pp cppo -slash -ml-synonym .ml4 -ml-synonym .mlpack
 
 MAINMLFILES := $(filter-out checker/% plugins/%, $(MLFILES) $(MLIFILES))
 MAINMLLIBFILES := $(filter-out checker/% plugins/%, $(MLLIBFILES) $(MLPACKFILES))

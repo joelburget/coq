@@ -156,7 +156,7 @@ TACTIC EXTEND dependent_rewrite
 END
 
 (** To be deprecated?, "cutrewrite (t=u) as <-" is equivalent to
-    "replace u with t" or "enough (t=u) as <-" and 
+    "replace u with t" or "enough (t=u) as <-" and
     "cutrewrite (t=u) as ->" is equivalent to "enough (t=u) as ->". *)
 
 TACTIC EXTEND cut_rewrite
@@ -613,6 +613,7 @@ END
 (**********************************************************************)
 (*spiwack : Vernac commands for retroknowledge                        *)
 
+(*
 VERNAC COMMAND EXTEND RetroknowledgeRegister CLASSIFIED AS SIDEFF
  | [ "Register" constr(c) "as" retroknowledge_field(f) "by" constr(b)] ->
            [ let tc,_ctx = Constrintern.interp_constr (Global.env ()) Evd.empty c in
@@ -621,7 +622,7 @@ VERNAC COMMAND EXTEND RetroknowledgeRegister CLASSIFIED AS SIDEFF
              let tb = EConstr.to_constr Evd.empty tb in
              Global.register f tc tb ]
 END
-
+*)
 
 
 (**********************************************************************)
@@ -640,7 +641,7 @@ TACTIC EXTEND dep_generalize_eqs_vars
 | ["dependent" "generalize_eqs_vars" hyp(id) ] -> [ abstract_generalize ~force_dep:true ~generalize_vars:true id ]
 END
 
-(** Tactic to automatically simplify hypotheses of the form [Π Δ, x_i = t_i -> T] 
+(** Tactic to automatically simplify hypotheses of the form [Π Δ, x_i = t_i -> T]
     where [t_i] is closed w.r.t. Δ. Such hypotheses are automatically generated
     during dependent induction. For internal use. *)
 
@@ -656,12 +657,12 @@ END
 (* Contributed by Chung-Kil Hur (Winter 2009)                         *)
 (**********************************************************************)
 
-let subst_var_with_hole occ tid t = 
+let subst_var_with_hole occ tid t =
   let occref = if occ > 0 then ref occ else Find_subterm.error_invalid_occurrence [occ] in
   let locref = ref 0 in
   let rec substrec x = match DAst.get x with
     | GVar id ->
-        if Id.equal id tid 
+        if Id.equal id tid
         then
 	  (decr occref;
 	   if Int.equal !occref 0 then x
@@ -702,7 +703,7 @@ let hResolve id c occ t =
   let c_raw = Detyping.detype Detyping.Now true env_ids env sigma c in
   let t_raw = Detyping.detype Detyping.Now true env_ids env sigma t in
   let rec resolve_hole t_hole =
-    try 
+    try
       Pretyping.understand env sigma t_hole
     with
       | Pretype_errors.PretypeError (_,_,Pretype_errors.UnsolvableImplicit _) as e ->
@@ -718,7 +719,7 @@ let hResolve id c occ t =
   end
 
 let hResolve_auto id c t =
-  let rec resolve_auto n = 
+  let rec resolve_auto n =
     try
       hResolve id c n t
     with
@@ -755,13 +756,13 @@ exception Found of unit Proofview.tactic
 let rewrite_except h =
   Proofview.Goal.enter begin fun gl ->
   let hyps = Tacmach.New.pf_ids_of_hyps gl in
-  Tacticals.New.tclMAP (fun id -> if Id.equal id h then Proofview.tclUNIT () else 
+  Tacticals.New.tclMAP (fun id -> if Id.equal id h then Proofview.tclUNIT () else
       Tacticals.New.tclTRY (Equality.general_rewrite_in true Locus.AllOccurrences true true id (mkVar h) false))
     hyps
   end
 
 
-let refl_equal = 
+let refl_equal =
   let coq_base_constant s =
     Coqlib.gen_reference_in_modules "RecursiveDefinition"
       (Coqlib.init_modules @ [["Coq";"Arith";"Le"];["Coq";"Arith";"Lt"]]) s in
@@ -820,7 +821,7 @@ let rec find_a_destructable_match sigma t =
 	  (* let _ = Pp.msgnl (Printer.pr_lconstr x)  in *)
 	  raise (Found (case_eq_intros_rewrite x))
     | _ -> EConstr.iter sigma (fun c -> find_a_destructable_match sigma c) t
-	
+
 
 let destauto t =
   Proofview.tclEVARMAP >>= fun sigma ->
@@ -828,7 +829,7 @@ let destauto t =
     Tacticals.New.tclZEROMSG (str "No destructable match found")
   with Found tac -> tac
 
-let destauto_in id = 
+let destauto_in id =
   Proofview.Goal.enter begin fun gl ->
   let ctype = Tacmach.New.pf_unsafe_type_of gl (mkVar id) in
 (*  Pp.msgnl (Printer.pr_lconstr (mkVar id)); *)
@@ -857,12 +858,12 @@ END
 
 (* ********************************************************************* *)
 
-let eq_constr x y = 
+let eq_constr x y =
   Proofview.Goal.enter begin fun gl ->
     let env = Tacmach.New.pf_env gl in
     let evd = Tacmach.New.project gl in
       match EConstr.eq_constr_universes env evd x y with
-      | Some _ -> Proofview.tclUNIT () 
+      | Some _ -> Proofview.tclUNIT ()
       | None -> Tacticals.New.tclFAIL 0 (str "Not equal")
   end
 

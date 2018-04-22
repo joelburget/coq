@@ -296,6 +296,7 @@ ARGUMENT EXTEND test_lpar_id_colon TYPED AS unit PRINTED BY pr_lpar_id_colon
 | [ local_test_lpar_id_colon(x) ] -> [ () ]
 END
 
+(*
 (* spiwack: the print functions are incomplete, but I don't know what they are
 	used for *)
 let pr_r_nat_field natf =
@@ -409,3 +410,4 @@ PRINTED BY pr_retroknowledge_field
 | [ retroknowledge_binary_n (n)] -> [ Retroknowledge.KN n ]*)
 | [ retroknowledge_int31 (i) "in" string(g)] -> [ Retroknowledge.KInt31(g,i) ]
 END
+*)

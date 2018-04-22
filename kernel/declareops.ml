@@ -25,14 +25,14 @@ let safe_flags oracle = {
 
 (** {6 Arities } *)
 
-let subst_decl_arity f g sub ar = 
+let subst_decl_arity f g sub ar =
   match ar with
-  | RegularArity x -> 
-    let x' = f sub x in 
+  | RegularArity x ->
+    let x' = f sub x in
       if x' == x then ar
       else RegularArity x'
-  | TemplateArity x -> 
-    let x' = g sub x in 
+  | TemplateArity x ->
+    let x' = g sub x in
       if x' == x then ar
       else TemplateArity x'
 
@@ -128,9 +128,9 @@ let hcons_const_def = function
 
 let hcons_const_universes cbu =
   match cbu with
-  | Monomorphic_const ctx -> 
+  | Monomorphic_const ctx ->
     Monomorphic_const (Univ.hcons_universe_context_set ctx)
-  | Polymorphic_const ctx -> 
+  | Polymorphic_const ctx ->
     Polymorphic_const (Univ.hcons_abstract_universe_context ctx)
 
 let hcons_const_body cb =
@@ -184,7 +184,7 @@ let subst_wf_paths sub p = Rtree.smartmap (subst_recarg sub) p
 
 let subst_regular_ind_arity sub s =
   let uar' = subst_mps sub s.mind_user_arity in
-    if uar' == s.mind_user_arity then s 
+    if uar' == s.mind_user_arity then s
     else { mind_user_arity = uar'; mind_sort = s.mind_sort }
 
 let subst_template_ind_arity sub s = s
@@ -358,7 +358,9 @@ and hcons_generic_module_body :
   let type_alg' = mb.mod_type_alg in
   let constraints' = Univ.hcons_universe_context_set mb.mod_constraints in
   let delta' = mb.mod_delta in
-  (* let retroknowledge' = mb.mod_retroknowledge in *)
+#ifndef BS
+  let retroknowledge' = mb.mod_retroknowledge in
+#endif
 
   if
     mb.mod_mp == mp' &&
@@ -366,8 +368,12 @@ and hcons_generic_module_body :
     mb.mod_type == type' &&
     mb.mod_type_alg == type_alg' &&
     mb.mod_constraints == constraints' &&
-    mb.mod_delta == delta' (* &&
-    mb.mod_retroknowledge == retroknowledge' *)
+    mb.mod_delta == delta' &&
+#ifndef BS
+    mb.mod_retroknowledge == retroknowledge'
+#else
+    true
+#endif
   then mb
   else {
     mod_mp = mp';
@@ -376,7 +382,9 @@ and hcons_generic_module_body :
     mod_type_alg = type_alg';
     mod_constraints = constraints';
     mod_delta = delta';
-    (* mod_retroknowledge = retroknowledge'; *)
+#ifndef BS
+    mod_retroknowledge = retroknowledge';
+#endif
   }
 
 and hcons_module_body mb =

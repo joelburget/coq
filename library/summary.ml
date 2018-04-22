@@ -42,14 +42,12 @@ let internal_declare_summary fadd sumname sdecl =
   fadd sumname ddecl;
   tag
 
-  (*
-let declare_ml_modules_summary decl =
-  let ml_add _ ddecl = sum_mod := Some ddecl in
-  internal_declare_summary ml_add ml_modules decl
+let declare_ml_modules_summary decl = failwith "undefined: declare_ml_modules_summary"
+  (* let ml_add _ ddecl = sum_mod := Some ddecl in *)
+  (* internal_declare_summary ml_add ml_modules decl *)
 
 let declare_ml_modules_summary decl =
   ignore(declare_ml_modules_summary decl)
-  *)
 
 let declare_summary_tag sumname decl =
   let fadd name ddecl = sum_map := String.Map.add name ddecl !sum_map in

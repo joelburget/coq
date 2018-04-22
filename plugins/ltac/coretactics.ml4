@@ -44,6 +44,7 @@ TACTIC EXTEND exact_no_check
   [ "exact_no_check" constr(c) ] -> [ Tactics.exact_no_check c ]
 END
 
+(*
 TACTIC EXTEND vm_cast_no_check
   [ "vm_cast_no_check" constr(c) ] -> [ Tactics.vm_cast_no_check c ]
 END
@@ -51,6 +52,7 @@ END
 TACTIC EXTEND native_cast_no_check
   [ "native_cast_no_check" constr(c) ] -> [ Tactics.native_cast_no_check c ]
 END
+*)
 
 TACTIC EXTEND casetype
   [ "casetype" constr(c) ] -> [ Tactics.case_type c ]
@@ -331,7 +333,7 @@ let initial_atomic () =
         "fresh", TacArg(Loc.tag @@ TacFreshId [])
       ]
 
-let () = Mltop.declare_cache_obj initial_atomic "ltac_plugin"
+(* let () = Mltop.declare_cache_obj initial_atomic "ltac_plugin" *)
 
 (* First-class Ltac access to primitive blocks *)
 
@@ -363,4 +365,4 @@ let initial_tacticals () =
     "solve", TacFun ([Name (idn 0)], TacML (None, (initial_entry "solve", [varn 0])));
   ]
 
-let () = Mltop.declare_cache_obj initial_tacticals "ltac_plugin"
+(* let () = Mltop.declare_cache_obj initial_tacticals "ltac_plugin" *)

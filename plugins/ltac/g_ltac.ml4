@@ -132,7 +132,7 @@ GEXTEND Gram
 (*End of To do*)
     | "2" RIGHTA
       [ ta0 = tactic_expr; "+"; ta1 = binder_tactic -> TacOr (ta0,ta1)
-      | ta0 = tactic_expr; "+"; ta1 = tactic_expr -> TacOr (ta0,ta1) 
+      | ta0 = tactic_expr; "+"; ta1 = tactic_expr -> TacOr (ta0,ta1)
       | IDENT "tryif" ; ta = tactic_expr ;
               "then" ; tat = tactic_expr ;
               "else" ; tae = tactic_expr -> TacIfThenCatch(ta,tat,tae)
@@ -248,7 +248,7 @@ GEXTEND Gram
 	  let t, ty =
 	    match mpv with
 	    | Term t -> (match t with
-	      | { CAst.v = CCast (t, (CastConv ty | CastVM ty | CastNative ty)) } -> Term t, Some (Term ty)
+	      | { CAst.v = CCast (t, (CastConv ty (* | CastVM ty | CastNative ty *))) } -> Term t, Some (Term ty)
 	      | _ -> mpv, None)
 	    | _ -> mpv, None
 	  in Def (na, t, Option.default (Term (CAst.make @@ CHole (None, IntroAnonymous, None))) ty)
@@ -332,7 +332,7 @@ GEXTEND Gram
       | g = OPT toplevel_selector; "{" -> Vernacexpr.VernacSubproof g ] ]
   ;
   command:
-    [ [ IDENT "Proof"; "with"; ta = Pltac.tactic; 
+    [ [ IDENT "Proof"; "with"; ta = Pltac.tactic;
         l = OPT [ "using"; l = G_vernac.section_subset_expr -> l ] ->
           Vernacexpr.VernacProof (Some (in_tac ta), l)
       | IDENT "Proof"; "using"; l = G_vernac.section_subset_expr;
