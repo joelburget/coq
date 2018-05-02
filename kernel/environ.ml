@@ -51,7 +51,7 @@ let empty_env = empty_env
 let engagement env = env.env_stratification.env_engagement
 let typing_flags env = env.env_typing_flags
 
-let is_impredicative_set env = 
+let is_impredicative_set env =
   match engagement env with
   | ImpredicativeSet -> true
   | _ -> false
@@ -181,7 +181,7 @@ let map_universes f env =
   let s = env.env_stratification in
     { env with env_stratification =
 	 { s with env_universes = f s.env_universes } }
-				     
+
 let add_constraints c env =
   if Univ.Constraint.is_empty c then env
   else map_universes (UGraph.merge_constraints c) env
@@ -199,7 +199,7 @@ let add_universes strict ctx g =
 	    g (Univ.Instance.to_array (Univ.UContext.instance ctx))
   in
     UGraph.merge_constraints (Univ.UContext.constraints ctx) g
-			   
+
 let push_context ?(strict=false) ctx env =
   map_universes (add_universes strict ctx) env
 
@@ -246,7 +246,7 @@ let constant_type env (kn,u) =
   let cb = lookup_constant kn env in
   match cb.const_universes with
   | Monomorphic_const _ -> cb.const_type, Univ.Constraint.empty
-  | Polymorphic_const ctx -> 
+  | Polymorphic_const ctx ->
     let csts = constraints_of cb u in
     (subst_instance_constr u cb.const_type, csts)
 
@@ -270,15 +270,15 @@ let constant_value_and_type env (kn, u) =
 	| Undef _ -> None
       in
 	b', subst_instance_constr u cb.const_type, cst
-    else 
+    else
       let b' = match cb.const_body with
 	| Def l_body -> Some (Mod_subst.force_constr l_body)
 	| OpaqueDef _ -> None
 	| Undef _ -> None
       in b', cb.const_type, Univ.Constraint.empty
 
-(* These functions should be called under the invariant that [env] 
-   already contains the constraints corresponding to the constant 
+(* These functions should be called under the invariant that [env]
+   already contains the constraints corresponding to the constant
    application. *)
 
 (* constant_type gives the type of a constant *)
@@ -291,7 +291,7 @@ let constant_type_in env (kn,u) =
 let constant_value_in env (kn,u) =
   let cb = lookup_constant kn env in
   match cb.const_body with
-    | Def l_body -> 
+    | Def l_body ->
       let b = Mod_subst.force_constr l_body in
 	subst_instance_constr u b
     | OpaqueDef _ -> raise (NotEvaluableConst Opaque)
@@ -320,12 +320,12 @@ let type_in_type_constant cst env =
   not (lookup_constant cst env).const_typing_flags.check_universes
 
 let lookup_projection cst env =
-  match (lookup_constant (Projection.constant cst) env).const_proj with 
+  match (lookup_constant (Projection.constant cst) env).const_proj with
   | Some pb -> pb
   | None -> anomaly (Pp.str "lookup_projection: constant is not a projection.")
 
 let is_projection cst env =
-  match (lookup_constant cst env).const_proj with 
+  match (lookup_constant cst env).const_proj with
   | Some _ -> true
   | None -> false
 
@@ -343,14 +343,14 @@ let type_in_type_ind (mind,i) env =
   not (lookup_mind mind env).mind_typing_flags.check_universes
 
 let template_polymorphic_ind (mind,i) env =
-  match (lookup_mind mind env).mind_packets.(i).mind_arity with 
+  match (lookup_mind mind env).mind_packets.(i).mind_arity with
   | TemplateArity _ -> true
   | RegularArity _ -> false
 
 let template_polymorphic_pind (ind,u) env =
   if not (Univ.Instance.is_empty u) then false
   else template_polymorphic_ind ind env
-  
+
 let add_mind_key kn mind_key env =
   let new_inds = Mindmap_env.add kn mind_key env.env_globals.env_inductives in
   let new_globals =
@@ -444,7 +444,7 @@ let lookup_module mp env =
     MPmap.find mp env.env_globals.env_modules
 
 
-let lookup_modtype mp env = 
+let lookup_modtype mp env =
   MPmap.find mp env.env_globals.env_modtypes
 
 (*s Judgments. *)
@@ -470,7 +470,9 @@ type unsafe_type_judgment = types punsafe_type_judgment
 
 (*s Compilation of global declaration *)
 
-(* let compile_constant_body = Cbytegen.compile_constant_body ~fail_on_error:false *)
+#ifndef BS
+let compile_constant_body = Cbytegen.compile_constant_body ~fail_on_error:false
+#endif
 
 exception Hyp_not_found
 
@@ -504,11 +506,11 @@ let remove_hyps ids check_context check_value ctxt =
   in
   fst (remove_hyps ctxt)
 
+#ifndef BS
 (*spiwack: the following functions assemble the pieces of the retroknowledge
    note that the "consistent" register function is available in the module
    Safetyping, Environ only synchronizes the proactive and the reactive parts*)
 
-(*
 open Retroknowledge
 
 (* lifting of the "get" functions works also for "mem"*)
@@ -564,9 +566,89 @@ let dispatch =
   let int31_op n op prim kn =
     { empty_reactive_info with
       vm_compiling = Some (Clambda.compile_prim n op kn);
-      (* native_compiling = Some (Nativelambda.compile_prim prim (Univ.out_punivs kn)); *)
+      native_compiling = Some (Nativelambda.compile_prim prim (Univ.out_punivs kn));
     }
   in
 
+fun rk value field ->
+  (* subfunction which shortens the (very common) dispatch of operations *)
+  let int31_op_from_const n op prim =
+    match kind value with
+      | Const kn ->  int31_op n op prim kn
+      | _ -> anomaly ~label:"Environ.register" (Pp.str "should be a constant.")
+  in
+  let int31_binop_from_const op prim = int31_op_from_const 2 op prim in
+  let int31_unop_from_const op prim = int31_op_from_const 1 op prim in
+  match field with
+    | KInt31 (grp, Int31Type) ->
+        let int31bit =
+          (* invariant : the type of bits is registered, otherwise the function
+             would raise Not_found. The invariant is enforced in safe_typing.ml *)
+          match field with
+          | KInt31 (grp, Int31Type) -> Retroknowledge.find rk (KInt31 (grp,Int31Bits))
+          | _ -> anomaly ~label:"Environ.register"
+              (Pp.str "add_int31_decompilation_from_type called with an abnormal field.")
+        in
+        let i31bit_type =
+          match kind int31bit with
+          | Ind (i31bit_type,_) -> i31bit_type
+          |  _ -> anomaly ~label:"Environ.register"
+              (Pp.str "Int31Bits should be an inductive type.")
+        in
+        let int31_decompilation =
+          match kind value with
+          | Ind (i31t,_) ->
+              constr_of_int31 i31t i31bit_type
+          | _ -> anomaly ~label:"Environ.register"
+              (Pp.str "should be an inductive type.")
+        in
+        { empty_reactive_info with
+          vm_decompile_const = Some int31_decompilation;
+          vm_before_match = Some Clambda.int31_escape_before_match;
+          native_before_match = Some (Nativelambda.before_match_int31 i31bit_type);
+        }
+    | KInt31 (_, Int31Constructor) ->
+        { empty_reactive_info with
+          vm_constant_static = Some Clambda.compile_structured_int31;
+          vm_constant_dynamic = Some Clambda.dynamic_int31_compilation;
+          native_constant_static = Some Nativelambda.compile_static_int31;
+          native_constant_dynamic = Some Nativelambda.compile_dynamic_int31;
+        }
+    | KInt31 (_, Int31Plus) -> int31_binop_from_const Cbytecodes.Kaddint31
+							  CPrimitives.Int31add
+    | KInt31 (_, Int31PlusC) -> int31_binop_from_const Cbytecodes.Kaddcint31
+							   CPrimitives.Int31addc
+    | KInt31 (_, Int31PlusCarryC) -> int31_binop_from_const Cbytecodes.Kaddcarrycint31
+								CPrimitives.Int31addcarryc
+    | KInt31 (_, Int31Minus) -> int31_binop_from_const Cbytecodes.Ksubint31
+							   CPrimitives.Int31sub
+    | KInt31 (_, Int31MinusC) -> int31_binop_from_const Cbytecodes.Ksubcint31
+							    CPrimitives.Int31subc
+    | KInt31 (_, Int31MinusCarryC) -> int31_binop_from_const
+	                                Cbytecodes.Ksubcarrycint31 CPrimitives.Int31subcarryc
+    | KInt31 (_, Int31Times) -> int31_binop_from_const Cbytecodes.Kmulint31
+							   CPrimitives.Int31mul
+    | KInt31 (_, Int31TimesC) -> int31_binop_from_const Cbytecodes.Kmulcint31
+							   CPrimitives.Int31mulc
+    | KInt31 (_, Int31Div21) -> int31_op_from_const 3 Cbytecodes.Kdiv21int31
+                                                           CPrimitives.Int31div21
+    | KInt31 (_, Int31Diveucl) -> int31_binop_from_const Cbytecodes.Kdivint31
+							 CPrimitives.Int31diveucl
+    | KInt31 (_, Int31AddMulDiv) -> int31_op_from_const 3 Cbytecodes.Kaddmuldivint31
+                                                         CPrimitives.Int31addmuldiv
+    | KInt31 (_, Int31Compare) -> int31_binop_from_const Cbytecodes.Kcompareint31
+							     CPrimitives.Int31compare
+    | KInt31 (_, Int31Head0) -> int31_unop_from_const Cbytecodes.Khead0int31
+							  CPrimitives.Int31head0
+    | KInt31 (_, Int31Tail0) -> int31_unop_from_const Cbytecodes.Ktail0int31
+							  CPrimitives.Int31tail0
+    | KInt31 (_, Int31Lor) -> int31_binop_from_const Cbytecodes.Klorint31
+							 CPrimitives.Int31lor
+    | KInt31 (_, Int31Land) -> int31_binop_from_const Cbytecodes.Klandint31
+							  CPrimitives.Int31land
+    | KInt31 (_, Int31Lxor) -> int31_binop_from_const Cbytecodes.Klxorint31
+							  CPrimitives.Int31lxor
+    | _ -> empty_reactive_info
+
 let _ = Hook.set Retroknowledge.dispatch_hook dispatch
-*)
+#endif

@@ -14,8 +14,11 @@ module type ExtS =
 sig
   include S
   [@@@ocaml.warning "-3"]     (* [@@noalloc] since 4.03.0 GPR#240 *)
-  (* external equal : string -> string -> bool = "caml_string_equal" "noalloc" *)
+#ifndef BS
+  external equal : string -> string -> bool = "caml_string_equal" "noalloc"
+#else
   val equal : string -> string -> bool
+#endif
   [@@@ocaml.warning "+3"]
   val hash : string -> int
   val is_empty : string -> bool
@@ -39,8 +42,11 @@ end
 include String
 
 [@@@ocaml.warning "-3"]     (* [@@noalloc] since 4.03.0 GPR#240 *)
-(* external equal : string -> string -> bool = "caml_string_equal" "noalloc" *)
+#ifndef BS
+external equal : string -> string -> bool = "caml_string_equal" "noalloc"
+#else
 let equal : string -> string -> bool = (==)
+#endif
 [@@@ocaml.warning "+3"]
 
 let rec hash len s i accu =

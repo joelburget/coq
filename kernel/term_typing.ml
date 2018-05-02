@@ -101,7 +101,7 @@ let inline_side_effects env body ctx side_eff =
     in
     let not_exists (c,_,_) =
       try ignore(Environ.lookup_constant c env); false
-      with Not_found -> true in 
+      with Not_found -> true in
     let cbl = List.filter not_exists cbl in
     (cbl, mb)
   in
@@ -335,9 +335,9 @@ let infer_declaration (type a) ~(trust : a trust) env (dcl : a constant_entry) =
            Vars.subst_univs_level_constr usubst t
       in
       let def = Constr.hcons (Vars.subst_univs_level_constr usubst j.uj_val) in
-      let def = 
+      let def =
 	if opaque then OpaqueDef (Opaqueproof.create (Future.from_val (def, Univ.ContextSet.empty)))
-	else Def (Mod_subst.from_val def) 
+	else Def (Mod_subst.from_val def)
       in
 	feedback_completion_typecheck feedback_id;
       {
@@ -351,9 +351,9 @@ let infer_declaration (type a) ~(trust : a trust) env (dcl : a constant_entry) =
 
   | ProjectionEntry {proj_entry_ind = ind; proj_entry_arg = i} ->
     let mib, _ = Inductive.lookup_mind_specif env (ind,0) in
-    let kn, pb = 
+    let kn, pb =
       match mib.mind_record with
-      | Some (Some (id, kns, pbs)) -> 
+      | Some (Some (id, kns, pbs)) ->
 	if i < Array.length pbs then
 	  kns.(i), pbs.(i)
 	else assert false
@@ -385,7 +385,11 @@ let record_aux env s_ty s_bo =
           if List.exists (NamedDecl.get_id %> Id.equal id) in_ty then None
           else Some (Id.to_string id))
         (keep_hyps env s_bo)) in
-  () (* Aux_file.record_in_aux "context_used" v *)
+#ifndef BS
+  Aux_file.record_in_aux "context_used" v
+#else
+  ()
+#endif
 
 let build_constant_declaration kn env result =
   let open Cooking in
@@ -418,7 +422,7 @@ let build_constant_declaration kn env result =
     let context_ids = List.map NamedDecl.get_id (named_context env) in
     let def = result.cook_body in
     match result.cook_context with
-    | None when not (List.is_empty context_ids) -> 
+    | None when not (List.is_empty context_ids) ->
         (* No declared section vars, and non-empty section context:
            we must look at the body NOW, if any *)
         let ids_typ = global_vars_set env typ in
@@ -431,15 +435,17 @@ let build_constant_declaration kn env result =
                 (Opaqueproof.force_proof (opaque_tables env) lc) in
             (* we force so that cst are added to the env immediately after *)
             ignore(Opaqueproof.force_constraints (opaque_tables env) lc);
-            (* if !Flags.record_aux_file then record_aux env ids_typ vars; *)
+#ifndef BS
+            if !Flags.record_aux_file then record_aux env ids_typ vars;
+#endif
             vars
         in
         keep_hyps env (Id.Set.union ids_typ ids_def), def
     | None ->
-        (*
+#ifndef BS
         if !Flags.record_aux_file then
           record_aux env Id.Set.empty Id.Set.empty;
-        *)
+#endif
         [], def (* Empty section context: no need to check *)
     | Some declared ->
         (* We use the declared set and chain a check of correctness *)
@@ -459,7 +465,7 @@ let build_constant_declaration kn env result =
               let inferred = keep_hyps env (Id.Set.union ids_typ ids_def) in
               check declared inferred) lc) in
   let univs = result.cook_universes in
-  let tps = 
+  let tps =
     let res =
       match result.cook_proj with
       (* | None -> compile_constant_body env univs def *)
@@ -506,7 +512,7 @@ let constant_entry_of_side_effect cb u =
     match cb.const_universes with
     | Monomorphic_const uctx ->
       Monomorphic_const_entry uctx
-    | Polymorphic_const auctx -> 
+    | Polymorphic_const auctx ->
       Polymorphic_const_entry (Univ.AUContext.repr auctx)
   in
   let pt =
@@ -536,7 +542,7 @@ type side_effect_role =
   | Subproof
   | Schema of inductive * string
 
-type exported_side_effect = 
+type exported_side_effect =
   Constant.t * constant_body * side_effect_role
 
 let export_side_effects mb env c =
@@ -547,7 +553,7 @@ let export_side_effects mb env c =
           (fun (b_ctx, _) -> b_ctx, ()) } in
       let not_exists (c,_,_,_) =
         try ignore(Environ.lookup_constant c env); false
-        with Not_found -> true in 
+        with Not_found -> true in
       let aux (acc,sl) { eff = se; from_env = mb } =
         let cbl = match se with
           | SEsubproof (c,cb,b) -> [c,cb,b,Subproof]
@@ -585,7 +591,7 @@ let export_side_effects mb env c =
              List.fold_left (fun (env,cbs) (kn, ocb, u, r) ->
                let ce = constant_entry_of_side_effect ocb u in
                let cb = translate_constant Pure env kn ce in
-               (push_seff env (kn, cb,`Nothing, Subproof),(kn,cb,r) :: cbs)) 
+               (push_seff env (kn, cb,`Nothing, Subproof),(kn,cb,r) :: cbs))
              (env,[]) cbs in
            translate_seff sl rest (cbs @ acc) env
         | Some sl, cbs :: rest ->
@@ -625,7 +631,7 @@ let translate_local_def env id centry =
   } in
   let decl = infer_declaration ~trust:Pure env (DefinitionEntry centry) in
   let typ = decl.cook_type in
-  (*
+#ifndef BS
   if Option.is_empty decl.cook_context && !Flags.record_aux_file then begin
     match decl.cook_body with
     | Undef _ -> ()
@@ -636,7 +642,7 @@ let translate_local_def env id centry =
          (Opaqueproof.force_proof (opaque_tables env) lc) in
        record_aux env ids_typ ids_def
   end;
-  *)
+#endif
   let () = match decl.cook_universes with
   | Monomorphic_const ctx -> assert (Univ.ContextSet.is_empty ctx)
   | Polymorphic_const _ -> assert false

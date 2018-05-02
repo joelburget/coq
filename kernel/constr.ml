@@ -16,7 +16,7 @@
 (* Optimization of substitution functions by Chet Murthy *)
 (* Optimization of lifting functions by Bruno Barras, Mar 1997 *)
 (* Hash-consing by Bruno Barras in Feb 1998 *)
-(* Restructuration of Coq of the type-checking kernel by Jean-Christophe 
+(* Restructuration of Coq of the type-checking kernel by Jean-Christophe
    Filliâtre, 1999 *)
 (* Abstraction of the syntax of terms and iterators by Hugo Herbelin, 2000 *)
 (* Cleaning and lightening of the kernel by Bruno Barras, Nov 2001 *)
@@ -35,7 +35,11 @@ type metavariable = int
 (* This defines the strategy to use for verifiying a Cast *)
 (* Warning: REVERTcast is not exported to vo-files; as of r14492, it has to *)
 (* come after the vo-exported cast_kind so as to be compatible with coqchk *)
-type cast_kind = (* VMcast | NATIVEcast | *) DEFAULTcast | REVERTcast
+#ifndef BS
+type cast_kind = VMcast | NATIVEcast | DEFAULTcast | REVERTcast
+#else
+type cast_kind = DEFAULTcast | REVERTcast
+#endif
 
 (* This defines Cases annotations *)
 type case_style = LetStyle | IfStyle | LetPatternStyle | MatchStyle | RegularStyle
@@ -146,7 +150,9 @@ let mkSort   = function
 (* (that means t2 is declared as the type of t1) *)
 let mkCast (t1,k2,t2) =
   match t1 with
-  (* | Cast (c,k1, _) when (k1 == VMcast || k1 == NATIVEcast) && k1 == k2 -> Cast (c,k1,t2) *)
+#ifndef BS
+  | Cast (c,k1, _) when (k1 == VMcast || k1 == NATIVEcast) && k1 == k2 -> Cast (c,k1,t2)
+#endif
   | _ -> Cast (t1,k2,t2)
 
 (* Constructs the product (x:t1)t2 *)
@@ -746,7 +752,7 @@ let equal n m = eq_constr 0 m n (* to avoid tracing a recursive fun *)
 
 let eq_constr_univs univs m n =
   if m == n then true
-  else 
+  else
     let eq_universes _ _ = UGraph.check_eq_instances univs in
     let eq_sorts s1 s2 = s1 == s2 || UGraph.check_eq univs (Sorts.univ_of_sort s1) (Sorts.univ_of_sort s2) in
     let rec eq_constr' nargs m n =
@@ -755,11 +761,11 @@ let eq_constr_univs univs m n =
 
 let leq_constr_univs univs m n =
   if m == n then true
-  else 
+  else
     let eq_universes _ _ = UGraph.check_eq_instances univs in
-    let eq_sorts s1 s2 = s1 == s2 || 
+    let eq_sorts s1 s2 = s1 == s2 ||
       UGraph.check_eq univs (Sorts.univ_of_sort s1) (Sorts.univ_of_sort s2) in
-    let leq_sorts s1 s2 = s1 == s2 || 
+    let leq_sorts s1 s2 = s1 == s2 ||
       UGraph.check_leq univs (Sorts.univ_of_sort s1) (Sorts.univ_of_sort s2) in
     let rec eq_constr' nargs m n =
       m == n || compare_head_gen eq_universes eq_sorts eq_constr' nargs m n
@@ -771,10 +777,10 @@ let leq_constr_univs univs m n =
 
 let eq_constr_univs_infer univs m n =
   if m == n then true, Constraint.empty
-  else 
+  else
     let cstrs = ref Constraint.empty in
     let eq_universes _ _ = UGraph.check_eq_instances univs in
-    let eq_sorts s1 s2 = 
+    let eq_sorts s1 s2 =
       if Sorts.equal s1 s2 then true
       else
 	let u1 = Sorts.univ_of_sort s1 and u2 = Sorts.univ_of_sort s2 in
@@ -791,10 +797,10 @@ let eq_constr_univs_infer univs m n =
 
 let leq_constr_univs_infer univs m n =
   if m == n then true, Constraint.empty
-  else 
+  else
     let cstrs = ref Constraint.empty in
     let eq_universes _ _ l l' = UGraph.check_eq_instances univs l l' in
-    let eq_sorts s1 s2 = 
+    let eq_sorts s1 s2 =
       if Sorts.equal s1 s2 then true
       else
 	let u1 = Sorts.univ_of_sort s1 and u2 = Sorts.univ_of_sort s2 in
@@ -802,13 +808,13 @@ let leq_constr_univs_infer univs m n =
 	else (cstrs := Univ.enforce_eq u1 u2 !cstrs;
 	      true)
     in
-    let leq_sorts s1 s2 = 
+    let leq_sorts s1 s2 =
       if Sorts.equal s1 s2 then true
-      else 
+      else
 	let u1 = Sorts.univ_of_sort s1 and u2 = Sorts.univ_of_sort s2 in
 	if UGraph.check_leq univs u1 u2 then true
 	else
-	  (cstrs := Univ.enforce_leq u1 u2 !cstrs; 
+	  (cstrs := Univ.enforce_leq u1 u2 !cstrs;
 	   true)
     in
     let rec eq_constr' nargs m n =
@@ -983,8 +989,10 @@ let term_array_table = HashsetTermArray.create 4999
 open Hashset.Combine
 
 let hash_cast_kind = function
-(* | VMcast -> 0
-| NATIVEcast -> 1 *)
+#ifndef BS
+| VMcast -> 0
+| NATIVEcast -> 1
+#endif
 | DEFAULTcast -> 2
 | REVERTcast -> 3
 
@@ -1034,7 +1042,7 @@ let hashcons (sh_sort,sh_ci,sh_construct,sh_ind,sh_con,sh_na,sh_id) =
 	(Const (c', u'), combinesmall 9 (combine (Constant.SyntacticOrd.hash c) hu))
       | Ind (ind,u) ->
 	let u', hu = sh_instance u in
-	(Ind (sh_ind ind, u'), 
+	(Ind (sh_ind ind, u'),
 	 combinesmall 10 (combine (ind_syntactic_hash ind) hu))
       | Construct (c,u) ->
 	let u', hu = sh_instance u in

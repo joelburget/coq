@@ -102,8 +102,10 @@ let subst_const_body sub cb =
         const_body = body';
         const_type = type';
         const_proj = proj';
-        (* const_body_code =
-          Option.map (Cemitcodes.subst_to_patch_subst sub) cb.const_body_code; *)
+#ifndef BS
+        const_body_code =
+          Option.map (Cemitcodes.subst_to_patch_subst sub) cb.const_body_code;
+#endif
         const_universes = cb.const_universes;
         const_inline_code = cb.const_inline_code;
         const_typing_flags = cb.const_typing_flags }

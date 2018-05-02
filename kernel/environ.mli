@@ -67,7 +67,7 @@ val push_rel         : Context.Rel.Declaration.t -> env -> env
 val push_rel_context : Context.Rel.t -> env -> env
 val push_rec_types   : rec_declaration -> env -> env
 
-(** Looks up in the context of local vars referred by indice ([rel_context]) 
+(** Looks up in the context of local vars referred by indice ([rel_context])
    raises [Not_found] if the index points out of the context *)
 val lookup_rel    : int -> env -> Context.Rel.Declaration.t
 val evaluable_rel : int -> env -> bool
@@ -98,7 +98,7 @@ val push_named_context_val  :
 
 
 
-(** Looks up in the context of local vars referred by names ([named_context]) 
+(** Looks up in the context of local vars referred by names ([named_context])
    raises [Not_found] if the Id.t is not found *)
 
 val lookup_named     : variable -> env -> Context.Named.Declaration.t
@@ -132,7 +132,7 @@ val add_constant : Constant.t -> constant_body -> env -> env
 val add_constant_key : Constant.t -> constant_body -> Pre_env.link_info ->
   env -> env
 
-(** Looks up in the context of global constant names 
+(** Looks up in the context of global constant names
    raises [Not_found] if the required path is not found *)
 val lookup_constant    : Constant.t -> env -> constant_body
 val evaluable_constant : Constant.t -> env -> bool
@@ -145,7 +145,7 @@ val type_in_type_constant : Constant.t -> env -> bool
 (** {6 ... } *)
 (** [constant_value env c] raises [NotEvaluableConst Opaque] if
    [c] is opaque and [NotEvaluableConst NoBody] if it has no
-   body and [NotEvaluableConst IsProj] if [c] is a projection 
+   body and [NotEvaluableConst IsProj] if [c] is a projection
    and [Not_found] if it does not exist in [env] *)
 
 type const_evaluation_result = NoBody | Opaque
@@ -153,14 +153,14 @@ exception NotEvaluableConst of const_evaluation_result
 
 val constant_type : env -> Constant.t puniverses -> types constrained
 
-val constant_value_and_type : env -> Constant.t puniverses -> 
+val constant_value_and_type : env -> Constant.t puniverses ->
   constr option * types * Univ.Constraint.t
-(** The universe context associated to the constant, empty if not 
+(** The universe context associated to the constant, empty if not
     polymorphic *)
 val constant_context : env -> Constant.t -> Univ.AUContext.t
 
-(* These functions should be called under the invariant that [env] 
-   already contains the constraints corresponding to the constant 
+(* These functions should be called under the invariant that [env]
+   already contains the constraints corresponding to the constant
    application. *)
 val constant_value_in : env -> Constant.t puniverses -> constr
 val constant_type_in : env -> Constant.t puniverses -> types
@@ -175,7 +175,7 @@ val is_projection : Constant.t -> env -> bool
 val add_mind_key : MutInd.t -> Pre_env.mind_key -> env -> env
 val add_mind : MutInd.t -> mutual_inductive_body -> env -> env
 
-(** Looks up in the context of global inductive names 
+(** Looks up in the context of global inductive names
    raises [Not_found] if the required path is not found *)
 val lookup_mind : MutInd.t -> env -> mutual_inductive_body
 
@@ -253,7 +253,9 @@ type unsafe_type_judgment = types punsafe_type_judgment
 
 (** {6 Compilation of global declaration } *)
 
-(* val compile_constant_body : env -> constant_universes -> constant_def -> Cemitcodes.body_code option *)
+#ifndef BS
+val compile_constant_body : env -> constant_universes -> constant_def -> Cemitcodes.body_code option
+#endif
 
 exception Hyp_not_found
 
@@ -268,9 +270,9 @@ val remove_hyps : Id.Set.t -> (Context.Named.Declaration.t -> Context.Named.Decl
 
 
 
-(*
+#ifndef BS
 open Retroknowledge
-(** functions manipulating the retroknowledge 
+(** functions manipulating the retroknowledge
     @author spiwack *)
 val retroknowledge : (retroknowledge->'a) -> env -> 'a
 
@@ -281,3 +283,4 @@ val register : env -> field -> Retroknowledge.entry -> env
 
 (** Native compiler *)
 val no_link_info : Pre_env.link_info
+#endif

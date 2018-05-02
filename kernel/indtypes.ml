@@ -197,7 +197,7 @@ let is_impredicative env u =
 
 (* Returns the list [x_1, ..., x_n] of levels contributing to template
    polymorphism. The elements x_k is None if the k-th parameter (starting
-   from the most recent and ignoring let-definitions) is not contributing 
+   from the most recent and ignoring let-definitions) is not contributing
    or is Some u_k if its level is u_k and is contributing. *)
 let param_ccls paramsctxt =
   let fold acc = function
@@ -223,7 +223,7 @@ let check_subtyping_arity_constructor env (subst : constr -> constr) (arcn : typ
       begin
        try
           basic_check typ_env typ'; Environ.push_rel typ typ_env
-        with NotConvertible -> 
+        with NotConvertible ->
           anomaly ~label:"bad inductive subtyping relation" (Pp.str "Invalid subtyping relation")
       end
     | _ -> anomaly (Pp.str "")
@@ -234,7 +234,7 @@ let check_subtyping_arity_constructor env (subst : constr -> constr) (arcn : typ
 
 (* Check that the subtyping information inferred for inductive types in the block is correct. *)
 (* This check produces a value of the unit type if successful or raises an anomaly if check fails. *)
-let check_subtyping cumi paramsctxt env_ar inds = 
+let check_subtyping cumi paramsctxt env_ar inds =
     let numparams = Context.Rel.nhyps paramsctxt in
     let uctx = CumulativityInfo.univ_context cumi in
     let new_levels = Array.init (UContext.size uctx) (Level.make DirPath.empty) in
@@ -267,7 +267,7 @@ let check_subtyping cumi paramsctxt env_ar inds =
 (* Type-check an inductive definition. Does not check positivity
    conditions. *)
 (* TODO check that we don't overgeneralize construcors/inductive arities with
-   universes that are absent from them. Is it possible? 
+   universes that are absent from them. Is it possible?
 *)
 let typecheck_inductive env mie =
   let () = match mie.mind_entry_inds with
@@ -304,17 +304,17 @@ let typecheck_inductive env mie =
 		 let (cctx, _) = destArity proparity.utj_val in
 		   (* Any universe is well-formed, we don't need to check [s] here *)
 		   mkArity (cctx, s)
-	       | _ -> 
+	       | _ ->
 		 let arity = infer_type env_params ind.mind_entry_arity in
 		   arity.utj_val
 	   else let arity = infer_type env_params ind.mind_entry_arity in
 		  arity.utj_val
 	 in
 	 let (sign, deflev) = dest_arity env_params arity in
-	 let inflev = 
-	   (* The level of the inductive includes levels of indices if 
+	 let inflev =
+	   (* The level of the inductive includes levels of indices if
 	      in indices_matter mode *)
-	     if !indices_matter 
+	     if !indices_matter
 	     then Some (cumulate_arity_large_levels env_params sign)
 	     else None
 	 in
@@ -355,13 +355,13 @@ let typecheck_inductive env mie =
 
   let inds =
     Array.map (fun ((id,full_arity,sign,expltype,def_level,inf_level),cn,lc,(is_unit,clev))  ->
-      let infu = 
+      let infu =
 	(** Inferred level, with parameters and constructors. *)
 	match inf_level with
 	| Some alev -> Universe.sup clev alev
 	| None -> clev
       in
-      let full_polymorphic () = 
+      let full_polymorphic () =
         let defu = Sorts.univ_of_sort def_level in
 	let is_natural =
 	  type_in_type env || (UGraph.check_leq (universes env') infu defu)
@@ -372,7 +372,7 @@ let typecheck_inductive env mie =
 	  else (** Predicative case: the inferred level must be lower or equal to the
 		   declared level. *)
 	    if not is_natural then
-	      anomaly ~label:"check_inductive" 
+	      anomaly ~label:"check_inductive"
 		(Pp.str"Incorrect universe " ++
 		   Universe.pr defu ++ Pp.str " declared for inductive type, inferred level is "
 		 ++ Universe.pr infu ++ Pp.str ".")
@@ -392,7 +392,7 @@ let typecheck_inductive env mie =
             (* constraints over [u] *)
 	    let b = type_in_type env || UGraph.check_leq (universes env') infu u in
 	      if not b then
-		anomaly ~label:"check_inductive" 
+		anomaly ~label:"check_inductive"
 		  (Pp.str"Incorrect universe " ++
 		     Universe.pr u ++ Pp.str " declared for inductive type, inferred level is "
 		   ++ Universe.pr clev ++ Pp.str ".")
@@ -411,7 +411,7 @@ let typecheck_inductive env mie =
   in
   (* Check that the subtyping information inferred for inductive types in the block is correct. *)
   (* This check produces a value of the unit type if successful or raises an anomaly if check fails. *)
-  let () = 
+  let () =
     match mie.mind_entry_universes with
     | Monomorphic_ind_entry _ -> ()
     | Polymorphic_ind_entry _ -> ()
@@ -751,13 +751,13 @@ let small_sorts = [InProp;InSet]
 let logical_sorts = [InProp]
 
 let allowed_sorts is_smashed s =
-  if not is_smashed 
+  if not is_smashed
   then (** Naturally in the defined sort.
 	   If [s] is Prop, it must be small and unitary.
 	   Unsmashed, predicative Type and Set: all elimination allowed
 	   as well. *)
       all_sorts
-  else 
+  else
     match Sorts.family s with
     (* Type: all elimination allowed: above and below *)
     | InType -> all_sorts
@@ -765,7 +765,7 @@ let allowed_sorts is_smashed s =
     | InSet -> small_sorts
     (* Smashed to Prop, no informative eliminations allowed *)
     | InProp -> logical_sorts
-    
+
 (* Previous comment: *)
 (* Unitary/empty Prop: elimination to all sorts are realizable *)
 (* unless the type is large. If it is large, forbids large elimination *)
@@ -795,7 +795,7 @@ exception UndefinableExpansion
 
 (** From a rel context describing the constructor arguments,
     build an expansion function.
-    The term built is expecting to be substituted first by 
+    The term built is expecting to be substituted first by
     a substitution of the form [params, x : ind params] *)
 let compute_projections ((kn, _ as ind), u as indu) n x nparamargs params
     mind_consnrealdecls mind_consnrealargs paramslet ctx =
@@ -816,7 +816,7 @@ let compute_projections ((kn, _ as ind), u as indu) n x nparamargs params
       mkRel 1 :: List.map (lift 1) subst in
       ty, subst
   in
-  let ci = 
+  let ci =
     let print_info =
       { ind_tags = []; cstr_tags = [|Context.Rel.to_tags ctx|]; style = LetStyle } in
       { ci_ind     = ind;
@@ -827,7 +827,7 @@ let compute_projections ((kn, _ as ind), u as indu) n x nparamargs params
   in
   let len = List.length ctx in
   let x = Name x in
-  let compat_body ccl i = 
+  let compat_body ccl i =
     (* [ccl] is defined in context [params;x:indty] *)
     (* [ccl'] is defined in context [params;x:indty;x:indty] *)
     let ccl' = liftn 1 2 ccl in
@@ -875,7 +875,7 @@ let compute_projections ((kn, _ as ind), u as indu) n x nparamargs params
 	let etab = it_mkLambda_or_LetIn (mkLambda (x, indty, term)) params in
 	let etat = it_mkProd_or_LetIn (mkProd (x, indty, ty)) params in
 	let body = { proj_ind = fst ind; proj_npars = nparamargs;
-		     proj_arg = i; proj_type = projty; proj_eta = etab, etat; 
+		     proj_arg = i; proj_type = projty; proj_eta = etab, etat;
 		     proj_body = compat } in
 	  (i + 1, j + 1, kn :: kns, body :: pbs,
 	   fterm :: subst, fterm :: letsubst)
@@ -890,11 +890,11 @@ let compute_projections ((kn, _ as ind), u as indu) n x nparamargs params
 let abstract_inductive_universes iu =
   match iu with
   | Monomorphic_ind_entry ctx -> (Univ.empty_level_subst, Monomorphic_ind ctx)
-  | Polymorphic_ind_entry ctx -> 
+  | Polymorphic_ind_entry ctx ->
     let (inst, auctx) = Univ.abstract_universes ctx in
     let inst = Univ.make_instance_subst inst in
     (inst, Polymorphic_ind auctx)
-  | Cumulative_ind_entry cumi -> 
+  | Cumulative_ind_entry cumi ->
     let (inst, acumi) = Univ.abstract_cumulativity_info cumi in
     let inst = Univ.make_instance_subst inst in
     (inst, Cumulative_ind acumi)
@@ -908,7 +908,7 @@ let build_inductive env prv iu env_ar paramsctxt kn isrecord isfinite inds nmr r
   let substunivs, aiu = abstract_inductive_universes iu in
   let paramsctxt = Vars.subst_univs_level_context substunivs paramsctxt in
   let env_ar =
-    let ctxunivs = Environ.rel_context env_ar in 
+    let ctxunivs = Environ.rel_context env_ar in
     let ctxunivs' = Vars.subst_univs_level_context substunivs ctxunivs in
       Environ.push_rel_context ctxunivs' env
   in
@@ -925,16 +925,16 @@ let build_inductive env prv iu env_ar paramsctxt kn isrecord isfinite inds nmr r
       Array.map (fun (d,_) -> Context.Rel.nhyps d - nparamargs)
 	splayed_lc in
     (* Elimination sorts *)
-    let arkind,kelim = 
+    let arkind,kelim =
       match ar_kind with
-      | TemplateArity (paramlevs, lev) -> 
+      | TemplateArity (paramlevs, lev) ->
 	let ar = {template_param_levels = paramlevs; template_level = lev} in
 	  TemplateArity ar, all_sorts
       | RegularArity (info,ar,defs) ->
         let s = Sorts.sort_of_univ defs in
 	let kelim = allowed_sorts info s in
-	let ar = RegularArity 
-	  { mind_user_arity = Vars.subst_univs_level_constr substunivs ar; 
+	let ar = RegularArity
+	  { mind_user_arity = Vars.subst_univs_level_constr substunivs ar;
             mind_sort = Sorts.sort_of_univ (Univ.subst_univs_level_universe substunivs defs); } in
 	  ar, kelim in
     (* Assigning VM tags to constructors *)
@@ -966,11 +966,13 @@ let build_inductive env prv iu env_ar paramsctxt kn isrecord isfinite inds nmr r
 	mind_recargs = recarg;
 	mind_nb_constant = !nconst;
 	mind_nb_args = !nblock;
-        (* mind_reloc_tbl = rtbl; *)
+#ifndef BS
+        mind_reloc_tbl = rtbl;
+#endif
       } in
   let packets = Array.map2 build_one_packet inds recargs in
   let pkt = packets.(0) in
-  let isrecord = 
+  let isrecord =
     match isrecord with
     | Some (Some rid) when pkt.mind_kelim == all_sorts
 			   && Array.length pkt.mind_consnames == 1
@@ -984,9 +986,9 @@ let build_inductive env prv iu env_ar paramsctxt kn isrecord isfinite inds nmr r
       in
       let indsp = ((kn, 0), u) in
       let rctx, indty = decompose_prod_assum (subst1 (mkIndU indsp) pkt.mind_nf_lc.(0)) in
-	(try 
+	(try
 	   let fields, paramslet = List.chop pkt.mind_consnrealdecls.(0) rctx in
-	   let kns, projs = 
+	   let kns, projs =
 	     compute_projections indsp pkt.mind_typename rid nparamargs paramsctxt
 	       pkt.mind_consnrealdecls pkt.mind_consnrealargs paramslet fields
 	   in Some (Some (rid, kns, projs))

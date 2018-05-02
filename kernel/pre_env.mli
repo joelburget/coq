@@ -19,7 +19,7 @@ type link_info =
   | LinkedInteractive of string
   | NotLinked
 
-type key = int CEphemeron.key option ref 
+type key = int CEphemeron.key option ref
 
 type constant_key = constant_body * (link_info ref * key)
 
@@ -59,7 +59,9 @@ type env = {
     env_nb_rel        : int;
     env_stratification : stratification;
     env_typing_flags  : typing_flags;
-    (* retroknowledge : Retroknowledge.retroknowledge; *)
+#ifndef BS
+    retroknowledge : Retroknowledge.retroknowledge;
+#endif
     indirect_pterms : Opaqueproof.opaquetab;
 }
 

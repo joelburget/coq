@@ -95,7 +95,11 @@ val mkType : Univ.Universe.t -> types
 
 
 (** This defines the strategy to use for verifiying a Cast *)
-type cast_kind = (* VMcast | NATIVEcast | *) DEFAULTcast | REVERTcast
+#ifndef BS
+type cast_kind = VMcast | NATIVEcast | DEFAULTcast | REVERTcast
+#else
+type cast_kind = DEFAULTcast | REVERTcast
+#endif
 
 (** Constructs the term [t1::t2], i.e. the term t{_ 1} casted with the
    type t{_ 2} (that means t2 is declared as the type of t1). *)
@@ -137,13 +141,13 @@ val mkConstructU : pconstructor -> constr
 val mkConstructUi : pinductive * int -> constr
 
 (** Constructs a destructor of inductive type.
-    
-    [mkCase ci p c ac] stand for match [c] as [x] in [I args] return [p] with [ac] 
+
+    [mkCase ci p c ac] stand for match [c] as [x] in [I args] return [p] with [ac]
     presented as describe in [ci].
 
     [p] stucture is [fun args x -> "return clause"]
 
-    [ac]{^ ith} element is ith constructor case presented as 
+    [ac]{^ ith} element is ith constructor case presented as
     {e lambda construct_args (without params). case_term } *)
 val mkCase : case_info * constr * constr * constr array -> constr
 
@@ -167,10 +171,10 @@ val mkFix : fixpoint -> constr
 
 (** If [funnames = [|f1,.....fn|]]
       [typarray = [|t1,...tn|]]
-      [bodies   = [b1,.....bn]] 
+      [bodies   = [b1,.....bn]]
    then [mkCoFix (i, (funnames, typarray, bodies))]
    constructs the ith function of the block
-   
+
     [CoFixpoint f1 = b1
      with       f2 = b2
      ...
@@ -341,7 +345,7 @@ val equal : constr -> constr -> bool
    application grouping and the universe equalities in [u]. *)
 val eq_constr_univs : constr UGraph.check_function
 
-(** [leq_constr_univs u a b] is [true] if [a] is convertible to [b] modulo 
+(** [leq_constr_univs u a b] is [true] if [a] is convertible to [b] modulo
     alpha, casts, application grouping and the universe inequalities in [u]. *)
 val leq_constr_univs : constr UGraph.check_function
 
@@ -349,7 +353,7 @@ val leq_constr_univs : constr UGraph.check_function
    application grouping and the universe equalities in [u]. *)
 val eq_constr_univs_infer : UGraph.t -> constr -> constr -> bool Univ.constrained
 
-(** [leq_constr_univs u a b] is [true] if [a] is convertible to [b] modulo 
+(** [leq_constr_univs u a b] is [true] if [a] is convertible to [b] modulo
     alpha, casts, application grouping and the universe inequalities in [u]. *)
 val leq_constr_univs_infer : UGraph.t -> constr -> constr -> bool Univ.constrained
 

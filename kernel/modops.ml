@@ -146,11 +146,17 @@ let rec functor_iter fty f0 = function
 
 let module_type_of_module mb =
   { mb with mod_expr = (); mod_type_alg = None;
-    (* mod_retroknowledge = ModTypeRK; *) }
+#ifndef BS
+  mod_retroknowledge = ModTypeRK;
+#endif
+  }
 
 let module_body_of_type mp mtb =
   { mtb with mod_expr = Abstract; mod_mp = mp;
-      (* mod_retroknowledge = ModBodyRK []; *) }
+#ifndef BS
+             mod_retroknowledge = ModBodyRK [];
+#endif
+  }
 
 let check_modpath_equiv env mp1 mp2 =
   if ModPath.equal mp1 mp2 then ()
@@ -263,7 +269,7 @@ let subst_structure subst = subst_structure subst do_delta_codom
 
 (** {6 Retroknowledge } *)
 
-(*
+#ifndef BS
 (* spiwack: here comes the function which takes care of importing
    the retroknowledge declared in the library *)
 (* lclrk : retroknowledge_action list, rkaction : retroknowledge action *)
@@ -285,7 +291,7 @@ let add_retroknowledge mp =
      tail recursivity, but the world will have exploded before any module
      imports 10 000 retroknowledge registration.*)
   List.fold_right perform lclrk env
-*)
+#endif
 
 (** {6 Adding a module in the environment } *)
 
@@ -296,8 +302,8 @@ let rec add_structure mp sign resolver linkinfo env =
       Environ.add_constant_key c cb linkinfo env
     |SFBmind mib ->
       let mind = mind_of_delta_kn resolver (KerName.make2 mp l) in
-      let mib = 
-	if mib.mind_private != None then 
+      let mib =
+	if mib.mind_private != None then
 	  { mib with mind_private = Some true }
 	else mib
       in
@@ -312,7 +318,9 @@ and add_module mb linkinfo env =
   let env = Environ.shallow_add_module mb env in
   match mb.mod_type with
   |NoFunctor struc ->
-    (* add_retroknowledge mp mb.mod_retroknowledge *)
+#ifndef BS
+    add_retroknowledge mp mb.mod_retroknowledge
+#endif
       (add_structure mp struc mb.mod_delta linkinfo env)
   |MoreFunctor _ -> env
 
@@ -342,8 +350,12 @@ let strengthen_const mp_from l cb resolver =
       | Polymorphic_const ctx -> Univ.make_abstract_instance ctx
     in
       { cb with
-  const_body = Def (Mod_subst.from_val (mkConstU (con,u))); }
-        (* const_body_code = Some (Cemitcodes.from_val (Cbytegen.compile_alias con)) } *)
+       const_body = Def (Mod_subst.from_val (mkConstU (con,u))); }
+#ifndef BS
+       const_body_code = Some (Cemitcodes.from_val (Cbytegen.compile_alias con)) }
+#else
+      }
+#endif
 
 let rec strengthen_mod mp_from mp_to mb =
   if mp_in_delta mb.mod_mp mb.mod_delta then mb

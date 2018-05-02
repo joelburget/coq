@@ -182,8 +182,10 @@ let reset_style = {
   suffix = None;
 }
 
-(* let has_style t =
-  Unix.isatty t && Sys.os_type = "Unix" *)
+#ifndef BS
+let has_style t =
+  Unix.isatty t && Sys.os_type = "Unix"
+#endif
 
 let split c s =
   let len = String.length s in

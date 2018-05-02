@@ -60,9 +60,11 @@ val eval : style -> string
 val reset : string
 (** This escape sequence resets all attributes. *)
 
-(* val has_style : Unix.file_descr -> bool *)
+#ifndef BS
+val has_style : Unix.file_descr -> bool
 (** Whether an output file descriptor handles styles. Very heuristic, only
     checks it is a terminal. *)
+#endif
 
 val parse : string -> (string * style) list
 (** Parse strings describing terminal styles in the LS_COLORS syntax. For

@@ -12,9 +12,17 @@
 
 type t = int
 
+#ifndef BS
+external equal : t -> t -> bool = "%eq"
+#else
 val equal : t -> t -> bool
+#endif
 
+#ifndef BS
+external compare : t -> t -> int = "caml_int_compare"
+#else
 val compare : t -> t -> int
+#endif
 
 val hash : t -> int
 

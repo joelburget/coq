@@ -20,7 +20,7 @@ package "clib" (
   version     = "8.8"
 
   directory   = "clib"
-  requires    = "num, str"
+  requires    = "num, str, unix, threads"
 
   archive(byte)    = "clib.cma"
   archive(native)  = "clib.cmxa"
@@ -69,7 +69,7 @@ package "kernel" (
 
   directory   = "kernel"
 
-  requires    = "coq.lib"
+  requires    = "dynlink, coq.lib, coq.vm"
 
   archive(byte)    = "kernel.cma"
   archive(native)  = "kernel.cmxa"

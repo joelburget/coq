@@ -58,7 +58,9 @@ module type S =
     (** This create a hashtable of the hashconsed objects. *)
     val hcons : table -> t -> t
     (** Perform the hashconsing of the given object within the table. *)
-    (* val stats : table -> Hashset.statistics *)
+#ifndef BS
+    val stats : table -> Hashset.statistics
+#endif
     (** Recover statistics of the hashconsing table. *)
   end
 

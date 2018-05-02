@@ -374,10 +374,10 @@ let push_name_env ?(global_level=false) ntnvars implargs env =
       if Id.Map.is_empty ntnvars && Id.equal id ldots_var
         then error_ldots_var ?loc;
       set_var_scope ?loc id false (env.tmp_scope,env.scopes) ntnvars;
-      (*
+#ifndef BS
       if global_level then Dumpglob.dump_definition CAst.(make ?loc id) true "var"
       else Dumpglob.dump_binding ?loc id;
-      *)
+#endif
       {env with ids = Id.Set.add id env.ids; impls = Id.Map.add id implargs env.impls}
 
 let intern_generalized_binder ?(global_level=false) intern_type ntnvars
@@ -871,7 +871,9 @@ let intern_notation intern env ntnvars loc ntn fullargs =
   let ntn,fullargs = contract_curly_brackets ntn fullargs in
   (* Recover interpretation { } *)
   let ((ids,c),df) = interp_notation ?loc ntn (env.tmp_scope,env.scopes) in
-  (* Dumpglob.dump_notation_location (ntn_loc ?loc fullargs ntn) ntn df; *)
+#ifndef BS
+  Dumpglob.dump_notation_location (ntn_loc ?loc fullargs ntn) ntn df;
+#endif
   (* Dispatch parsing substitution to an interpretation substitution *)
   let subst = split_by_type ids fullargs in
   (* Instantiate the notation *)
@@ -906,7 +908,9 @@ let intern_var env (ltacvars,ntnvars) namedctx loc id us =
     let expl_impls = List.map
       (fun id -> CAst.make ?loc @@ CRef (make ?loc @@ Ident id,None), Some (make ?loc @@ ExplByName id)) expl_impls in
     let tys = string_of_ty ty in
-    (* Dumpglob.dump_reference ?loc "<>" (Id.to_string id) tys; *)
+#ifndef BS
+    Dumpglob.dump_reference ?loc "<>" (Id.to_string id) tys;
+#endif
     gvar (loc,id) us, make_implicits_list impls, argsc, expl_impls
   with Not_found ->
   (* Is [id] bound in current term or is an ltac var bound to constr *)
@@ -931,7 +935,9 @@ let intern_var env (ltacvars,ntnvars) namedctx loc id us =
 	let ref = VarRef id in
 	let impls = implicits_of_global ref in
 	let scopes = find_arguments_scope ref in
-        (* Dumpglob.dump_reference ?loc "<>" (string_of_qualid (Decls.variable_secpath id)) "var"; *)
+#ifndef BS
+        Dumpglob.dump_reference ?loc "<>" (string_of_qualid (Decls.variable_secpath id)) "var";
+#endif
 	DAst.make ?loc @@ GRef (ref, us), impls, scopes, []
       with e when CErrors.noncritical e ->
 	(* [id] a goal variable *)
@@ -967,14 +973,16 @@ let check_no_explicitation l =
   | (_, Some {loc}) :: _ ->
     user_err ?loc  (str"Unexpected explicitation of the argument of an abbreviation.")
 
-    (*
+#ifndef BS
 let dump_extended_global loc = function
   | TrueGlobal ref -> (*feedback_global loc ref;*) Dumpglob.add_glob ?loc ref
   | SynDef sp -> Dumpglob.add_glob_kn ?loc sp
-  *)
+#else
+let dump_extended_global loc = ()
+#endif
 
 let intern_extended_global_of_qualid {loc;v=qid} =
-  let r = Nametab.locate_extended qid in (*dump_extended_global loc r;*) r
+  let r = Nametab.locate_extended qid in dump_extended_global loc r; r
 let intern_reference ref =
   let qid = qualid_of_reference ref in
   let r =
@@ -1510,7 +1518,9 @@ let drop_notations_pattern looked_for genv =
 	| _ -> raise Not_found)
       | TrueGlobal g ->
 	  test_kind top g;
-          (* Dumpglob.add_glob ?loc:qid.loc g; *)
+#ifndef BS
+          Dumpglob.add_glob ?loc:qid.loc g;
+#endif
 	  let (_,argscs) = find_remaining_scopes [] pats g in
 	  Some (g,[],List.map2 (fun x -> in_pat false (x,snd scopes)) argscs pats)
     with Not_found -> None
@@ -1561,7 +1571,9 @@ let drop_notations_pattern looked_for genv =
       let ntn,(terms,termlists) = contract_curly_brackets_pat ntn fullargs in
       let ((ids',c),df) = Notation.interp_notation ?loc ntn scopes in
       let (terms,termlists) = split_by_type_pat ?loc ids' (terms,termlists) in
-      (* Dumpglob.dump_notation_location (patntn_loc ?loc fullargs ntn) ntn df; *)
+#ifndef BS
+      Dumpglob.dump_notation_location (patntn_loc ?loc fullargs ntn) ntn df;
+#endif
       in_not top loc scopes (terms,termlists) extrargs c
     | CPatDelimiters (key, e) ->
       in_pat top (None,find_delimiters_scope ?loc key::snd scopes) e
@@ -2044,14 +2056,14 @@ let internalize globalenv env pattern_mode (_, ntnvars as lvar) c =
     | CCast (c1, c2) ->
 	DAst.make ?loc @@
         GCast (intern env c1, Miscops.map_cast_type (intern_type env) c2)
-        (*
+#ifndef BS
     | CProj (pr, c) ->
       match intern_reference pr with
       | ConstRef p ->
         DAst.make ?loc @@ GProj (Projection.make p false, intern env c)
       | _ ->
         raise (InternalizationError (loc,IllegalMetavariable)) (* FIXME *)
-  *)
+#endif
     )
   and intern_type env = intern (set_type_scope env)
 

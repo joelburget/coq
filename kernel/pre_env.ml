@@ -26,7 +26,7 @@ module NamedDecl = Context.Named.Declaration
 (* The key attached to each constant is used by the VM to retrieve previous *)
 (* evaluations of the constant. It is essentially an index in the symbols table *)
 (* used by the VM. *)
-type key = int CEphemeron.key option ref 
+type key = int CEphemeron.key option ref
 
 (** Linking information for the native compiler. *)
 
@@ -80,7 +80,9 @@ type env = {
   env_nb_rel        : int;
   env_stratification : stratification;
   env_typing_flags  : typing_flags;
-  (* retroknowledge : Retroknowledge.retroknowledge; *)
+#ifndef BS
+  retroknowledge : Retroknowledge.retroknowledge;
+#endif
   indirect_pterms : Opaqueproof.opaquetab;
 }
 
@@ -107,7 +109,9 @@ let empty_env = {
     env_universes = UGraph.initial_universes;
     env_engagement = PredicativeSet };
   env_typing_flags = Declareops.safe_flags Conv_oracle.empty;
-  (* retroknowledge = Retroknowledge.initial_retroknowledge; *)
+#ifndef BS
+  retroknowledge = Retroknowledge.initial_retroknowledge;
+#endif
   indirect_pterms = Opaqueproof.empty_opaquetab }
 
 

@@ -395,7 +395,7 @@ let notation_constr_and_vars_of_glob_constr recvars a =
 	(* Fall on the second part of the recursive pattern w/o having
 	   found the first part *)
         let loc = t.CAst.loc in
-	user_err ?loc 
+	user_err ?loc
 	(str "Cannot find where the recursive pattern starts.")
       | _ -> aux' c
       end
@@ -1067,14 +1067,18 @@ let match_termlist match_fun alp metas sigma rest x y iter termin revert =
 let match_cast match_fun sigma c1 c2 =
   match c1, c2 with
   | CastConv t1, CastConv t2 ->
-  (* | CastVM t1, CastVM t2
-  | CastNative t1, CastNative t2 -> *)
+#ifndef BS
+  | CastVM t1, CastVM t2
+  | CastNative t1, CastNative t2 ->
+#endif
     match_fun sigma t1 t2
   | CastCoerce, CastCoerce ->
     sigma
   | CastConv _, _
-  (* | CastVM _, _
-  | CastNative _, _ *)
+#ifndef BS
+  | CastVM _, _
+  | CastNative _, _
+#endif
   | CastCoerce, _ -> raise No_match
 
 let does_not_come_from_already_eta_expanded_var glob =

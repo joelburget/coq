@@ -104,7 +104,7 @@ type global_declaration =
   | ConstantEntry : 'a effect_entry * 'a Entries.constant_entry -> global_declaration
   | GlobalRecipe of Cooking.recipe
 
-type exported_private_constant = 
+type exported_private_constant =
   Constant.t * private_constant_role
 
 val export_private_constants : in_section:bool ->
@@ -176,7 +176,7 @@ val add_include :
   Entries.module_struct_entry -> bool -> Declarations.inline ->
    Mod_subst.delta_resolver safe_transformer
 
-(*
+#ifndef BS
 val current_modpath : safe_environment -> ModPath.t
 
 val current_dirpath : safe_environment -> DirPath.t
@@ -199,7 +199,7 @@ val export :
 (* Constraints are non empty iff the file is a vi2vo *)
 val import : compiled_library -> Univ.ContextSet.t -> vodigest ->
   ModPath.t safe_transformer
-*)
+#endif
 
 (** {6 Safe typing judgments } *)
 
@@ -220,14 +220,14 @@ val delta_of_senv :
 
 (** {6 Retroknowledge / Native compiler } *)
 
-  (*
+#ifndef BS
 open Retroknowledge
 
 val retroknowledge : (retroknowledge-> 'a) -> safe_environment -> 'a
 
 val register :
   field -> Retroknowledge.entry -> Constr.constr -> safe_transformer0
-  *)
+#endif
 
 val register_inline : Constant.t -> safe_transformer0
 

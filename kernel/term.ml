@@ -53,7 +53,11 @@ type case_info = Constr.case_info =
   }
 
 type cast_kind = Constr.cast_kind =
-  (* VMcast | NATIVEcast | *) DEFAULTcast | REVERTcast
+#ifndef BS
+  VMcast | NATIVEcast | DEFAULTcast | REVERTcast
+#else
+  DEFAULTcast | REVERTcast
+#endif
 
 (********************************************************************)
 (*       Constructions as implemented                               *)
@@ -94,7 +98,9 @@ type ('constr, 'types, 'sort, 'univs) kind_of_term =
   | CoFix     of ('constr, 'types) pcofixpoint
   | Proj      of Projection.t * 'constr
 
-(* type values = Vmvalues.values *)
+#ifndef BS
+type values = Vmvalues.values
+#endif
 
 (**********************************************************************)
 (**         Redeclaration of functions from module Constr             *)
@@ -117,7 +123,7 @@ let mkMeta = Constr.mkMeta
 let mkEvar = Constr.mkEvar
 let mkSort = Constr.mkSort
 let mkProp = Constr.mkProp
-let mkSet  = Constr.mkSet 
+let mkSet  = Constr.mkSet
 let mkType = Constr.mkType
 let mkCast = Constr.mkCast
 let mkProd = Constr.mkProd
@@ -581,7 +587,7 @@ let kind_of_type t = match kind_of_term t with
   | Prod (na,t,c) -> ProdType (na, t, c)
   | LetIn (na,b,t,c) -> LetInType (na, b, t, c)
   | App (c,l) -> AtomicType (c, l)
-  | (Rel _ | Meta _ | Var _ | Evar _ | Const _ 
+  | (Rel _ | Meta _ | Var _ | Evar _ | Const _
   | Proj _ | Case _ | Fix _ | CoFix _ | Ind _)
     -> AtomicType (t,[||])
   | (Lambda _ | Construct _) -> failwith "Not a type"
